@@ -1,0 +1,55 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+    <PropertyGroup>
+        <TargetFramework>net6.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Puroguramu.Domains\Puroguramu.Domains.csproj" />
+      <ProjectReference Include="..\Puroguramu.Infrastructures\Puroguramu.Infrastructures.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="6.0.28" />
+      <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="6.0.28" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.28" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="6.0.28">
+        <PrivateAssets>all</PrivateAssets>
+        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      </PackageReference>
+      <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="6.0.28" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.18" />
+      <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="6.0" />
+      <PackageReference Include="StyleCop.Analyzers" Version="1.1.118">
+        <PrivateAssets>all</PrivateAssets>
+        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      </PackageReference>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Data\" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <_ContentIncludedByDefault Remove="Areas\Identity\Pages\Account\Manage\ChangePassword.cshtml" />
+      <_ContentIncludedByDefault Remove="Areas\Identity\Pages\Account\Manage\Index.cshtml" />
+      <_ContentIncludedByDefault Remove="Areas\Identity\Pages\Account\Manage\_ManageNav.cshtml" />
+      <_ContentIncludedByDefault Remove="Areas\Identity\Pages\Account\Manage\_ViewImports.cshtml" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Content Remove="Pages\Shared\_CustomModal.cshtml" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Content Remove="Pages\Shared\_CustomModal.cshtml" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Remove="Data\puroguramu.sqlite-wal" />
+      <None Remove="Data\puroguramu.sqlite-shm" />
+    </ItemGroup>
+
+</Project>

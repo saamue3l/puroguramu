@@ -1,0 +1,220 @@
+﻿@page "/edit/lecon-{lessonId:int}/exercice-{exerciseId:int}"
+@model Puroguramu.App.Pages.Teachers.EditExercise
+@{
+    ViewBag.Title = "Éditer un exercice";
+}
+
+<section class="w-4/5">
+    <div class="w-3/5 flex items-center mt-16 mb-1">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white" class="w-4 h-4 mr-1">
+            <path d="M21.731 2.269a2.625 2.625 0 0 0-3.712 0l-1.157 1.157 3.712 3.712 1.157-1.157a2.625 2.625 0 0 0 0-3.712ZM19.513 8.199l-3.712-3.712-12.15 12.15a5.25 5.25 0 0 0-1.32 2.214l-.8 2.685a.75.75 0 0 0 .933.933l2.685-.8a5.25 5.25 0 0 0 2.214-1.32L19.513 8.2Z"/>
+        </svg>
+        <input id="intitule" type="text" class="text-white w-full text-2xl font-bold bg-transparent p-2 rounded-lg mr-1 transition duration-300 ease-in-out hover:bg-gray-800 hover:text-gray-300 focus:bg-gray-800 focus:text-gray-300 focus:border-transparent focus:outline-none" value="@Model.ExerciseObject.Titre" placeholder="Cliquez pour ajouter un titre">
+    </div>
+    <div class="flex items-end justify-between">
+        <div class="w-3/5 flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white" class="w-4 h-4 mr-1">
+                <path d="M21.731 2.269a2.625 2.625 0 0 0-3.712 0l-1.157 1.157 3.712 3.712 1.157-1.157a2.625 2.625 0 0 0 0-3.712ZM19.513 8.199l-3.712-3.712-12.15 12.15a5.25 5.25 0 0 0-1.32 2.214l-.8 2.685a.75.75 0 0 0 .933.933l2.685-.8a5.25 5.25 0 0 0 2.214-1.32L19.513 8.2Z"/>
+            </svg>
+            @{
+                var enonce = String.IsNullOrWhiteSpace(Model.ExerciseObject.Enonce) ? "" : Model.ExerciseObject.Enonce;
+            }
+            <textarea id="description" class="text-white text-xs font-light bg-transparent p-2 w-full rounded-lg mr-1 overflow-y-hidden transition duration-300 ease-in-out hover:bg-gray-800 hover:text-gray-300 focus:bg-gray-800 focus:text-gray-300 focus:border-transparent focus:outline-none" placeholder="Cliquez pour ajouter une description">@enonce</textarea>
+        </div>
+        <div class="w-2/5 flex items-center justify-end gap-4">
+            <p class="text-primary">Difficulté</p>
+            <select class="text-white text-xs bg-dark-blue border border-white rounded-lg px-3 py-2">
+                <option value="1" selected="@(Model.ExerciseObject.IDDifficulte == 1 ? "true" : null)">Facile</option>
+                <option value="2" selected="@(Model.ExerciseObject.IDDifficulte == 2 ? "true" : null)">Moyen</option>
+                <option value="3" selected="@(Model.ExerciseObject.IDDifficulte == 3 ? "true" : null)">Difficile</option>
+            </select>
+        </div>
+
+    </div>
+
+    <div class="border border-white mt-3 opacity-50"></div>
+
+    <div class="flex justify-between w-full mt-2">
+        <div class="flex flex-col w-1/2 mr-2">
+            <p class="text-lg font-light text-white-50">Modèle</p>
+            <div id="modeleForm">
+                @Html.AntiForgeryToken()
+                <div id="modeleEditor" class="h-72 py-4 pr-2 rounded-lg"></div>
+                <textarea id="codeInputArea" name="ModeleCode" style="display: none;"></textarea>
+            </div>
+        </div>
+        <div class="flex flex-col w-1/2 ml-2">
+            <p class="text-lg font-light text-white-50">Solution</p>
+            <div id="solutionForm">
+                @Html.AntiForgeryToken()
+                <div id="solutionEditor" class="h-72 py-4 pl-2 rounded-lg"></div>
+                <textarea id="codeInputArea" name="SolutionCode" style="display: none;"></textarea>
+            </div>
+        </div>
+    </div>
+    <div class="flex justify-between mt-4">
+        <button id="submitButton" type="button" class="w-1/4 px-4 py-2 bg-primary text-white rounded-lg hover:opacity-50">Tester le code</button>
+        <button id="editButton" type="button" class="px-4 py-2 bg-primary text-white rounded-lg hover:opacity-50 invisible">Enregistrer les modifications </button>
+    </div>
+</section>
+
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.12/ace.js"></script>
+    <script>
+
+    document.addEventListener('DOMContentLoaded', function() {
+        var modeleEditor = ace.edit("modeleEditor");
+        modeleEditor.setTheme("ace/theme/dracula");
+        modeleEditor.session.setMode("ace/mode/csharp");
+        modeleEditor.setOption("showPrintMargin", false);
+        var modele = @Html.Raw(Json.Serialize(Model.ExerciseObject.Modele));
+        if (modele) {
+            modeleEditor.session.setValue(modele);
+        } else {
+            modeleEditor.session.setValue("");
+        }
+
+        var solutionEditor = ace.edit("solutionEditor");
+        solutionEditor.setTheme("ace/theme/dracula");
+        solutionEditor.session.setMode("ace/mode/csharp");
+        solutionEditor.setOption("showPrintMargin", false);
+        var solution = @Html.Raw(Json.Serialize(Model.ExerciseObject.Solution));
+        if (solution) {
+            solutionEditor.session.setValue(solution);
+        } else {
+            solutionEditor.session.setValue("");
+        }
+    });
+
+    var modeleEditor = ace.edit("modeleEditor");
+    var solutionEditor = ace.edit("solutionEditor");
+
+    modeleEditor.getSession().on('change', function() {
+        $('#editButton').css('opacity', '0.3');
+    });
+
+    solutionEditor.getSession().on('change', function() {
+        $('#editButton').css('opacity', '0.3');
+    });
+
+    $('#editButton').click(function() {
+        if ($(this).css('opacity') != '1') {
+            toastr.warning('Veuillez tester le code avant de sauvegarder les modifications.');
+            return;
+        }
+        var titre = $('#intitule').val();
+        var enonce = $('#description').val();
+        var difficulte = $('select').val();
+        var modeleCode = modeleEditor.getValue();
+        var solutionCode = solutionEditor.getValue();
+        var EditExerciceSaveChangesInputModel = {
+            LessonId: @Model.Lesson.IDLecon,
+            ExerciseId: @Model.ExerciseObject.IDExercice,
+            Titre: titre,
+            Enonce: enonce,
+            IDDifficulte: difficulte,
+            Modele: modeleCode,
+            Solution: solutionCode
+        };
+        $.ajax({
+            url: '?handler=SaveChanges',
+            type: 'POST',
+            data: JSON.stringify(EditExerciceSaveChangesInputModel),
+            contentType: 'application/json',
+            headers: {
+                RequestVerificationToken: $('input:hidden[name="__RequestVerificationToken"]').val()
+            },
+            success: function(response) {
+                toastr.success('Les modifications ont été enregistrées avec succès.');
+            },
+            error: function() {
+                toastr.error('Erreur lors de l’enregistrement des modifications.');
+            }
+        });
+    });
+
+    $('#submitButton').click(function() {
+    var modeleEditor = ace.edit("modeleEditor");
+    var solutionEditor = ace.edit("solutionEditor");
+
+    var modeleCode = modeleEditor.getValue();
+    var solutionCode = solutionEditor.getValue();
+
+        if(modeleCode == "" || solutionCode == ""){
+            toastr.error('Veuillez remplir les champs de code avant de tester.');
+            return;
+        }
+
+    var submitButton = $(this);
+    var originalButtonHtml = submitButton.html();
+    submitButton.addClass('cursor-not-allowed no-hover-opacity');
+    submitButton.html('<div class="flex justify-center"><svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"> <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle> <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path> </svg></div>');
+        var EditExerciceTestCodeInputModel = {
+            Modele: modeleCode,
+            Solution: solutionCode
+        };
+    $.ajax({
+        url: '?handler=TestCode',
+        type: 'POST',
+        data: JSON.stringify(EditExerciceTestCodeInputModel),
+        contentType: 'application/json',
+        headers: {
+            RequestVerificationToken: $('input:hidden[name="__RequestVerificationToken"]').val()
+        },
+        success: function(response) {
+            var status = response.status;
+
+            if(status == "Error"){
+                var message = response.message;
+                toastr.error('Une erreur s\'est produite lors de l\'exécution du code : ' + message);
+                return;
+            }
+
+            var results = response.results;
+            if (status == "Passed") {
+                $('#editButton').removeClass('invisible').addClass('visible');
+                $('#editButton').css('opacity', '1');
+                toastr.success('Code validé, vous pouvez enregistrer les modifications');
+            } else {
+                var passedResults = results.filter(function(result) {
+                    return result.status === "Passed";
+                });
+                var failedResults = results.filter(function(result) {
+                    return result.status !== "Passed";
+                });
+
+                var passedResultsString = passedResults.map(function(result) {
+                    return "<div style='font-size: 0.8em; margin-bottom: 10px;'>" +
+                        "Label: " + result.label + "<br/>" +
+                        "Status: " + result.status +
+                        "</div><hr/>";
+                }).join("");
+
+                var failedResultsString = failedResults.map(function(result) {
+                    return "<div style='font-size: 0.8em; margin-bottom: 10px;'>" +
+                        "Label: " + result.label + "<br/>" +
+                        "Status: " + result.status + "<br/>" +
+                        "Error: " + result.error +
+                        "</div><hr/>";
+                }).join("");
+
+                if (passedResults.length > 0) {
+                    toastr.success(passedResultsString);
+                }
+                if (failedResults.length > 0) {
+                    toastr.error(failedResultsString);
+                }
+            }
+        },
+        error: function(xhr, status, error) {
+            submitButton.removeClass('cursor-not-allowed no-hover-opacity').html(originalButtonHtml);
+            toastr.error('Une erreur s\'est produite lors de l\'exécution du code.');
+        },
+        complete: function(xhr, status) {
+            submitButton.removeClass('cursor-not-allowed no-hover-opacity').html(originalButtonHtml);
+        }
+    });
+    return false;
+});
+</script>
+}

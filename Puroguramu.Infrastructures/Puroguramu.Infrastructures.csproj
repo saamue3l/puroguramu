@@ -1,0 +1,41 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net6.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Puroguramu.Domains\Puroguramu.Domains.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="MailKit" Version="4.5.0" />
+      <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="6.0.28" />
+      <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="3.11.0" />
+      <PackageReference Include="Microsoft.CodeAnalysis.Scripting.Common" Version="3.11.0" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.28" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="6.0.28">
+        <PrivateAssets>all</PrivateAssets>
+        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      </PackageReference>
+      <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="6.0.28" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="6.0.28" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.0" />
+      <PackageReference Include="StyleCop.Analyzers" Version="1.1.118">
+        <PrivateAssets>all</PrivateAssets>
+        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      </PackageReference>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Compile Remove="Repositories\LessonRepository.cs" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Migrations\SqliteMigrations\" />
+      <Folder Include="Migrations\SqlServerMigrations\" />
+    </ItemGroup>
+
+</Project>

@@ -1,0 +1,13 @@
+﻿@{
+    if (ViewData.TryGetValue("ParentLayout", out var parentLayout))
+    {
+        Layout = (string)parentLayout!;
+    }
+}
+
+@RenderBody()
+
+
+@section Scripts {
+    @RenderSection("Scripts", required: false)
+}

@@ -1,0 +1,170 @@
+﻿@page "/edit/lecon-{lessonId:int}"
+@model Puroguramu.App.Pages.Teachers.EditLesson
+@{
+    ViewBag.Title = "Éditer une leçon";
+}
+
+<section class="w-4/5">
+
+    <div class="w-3/5 flex items-center mt-16 mb-1">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white" class="w-4 h-4 mr-1">
+            <path d="M21.731 2.269a2.625 2.625 0 0 0-3.712 0l-1.157 1.157 3.712 3.712 1.157-1.157a2.625 2.625 0 0 0 0-3.712ZM19.513 8.199l-3.712-3.712-12.15 12.15a5.25 5.25 0 0 0-1.32 2.214l-.8 2.685a.75.75 0 0 0 .933.933l2.685-.8a5.25 5.25 0 0 0 2.214-1.32L19.513 8.2Z"/>
+        </svg>
+        <input id="intitule" type="text" onBlur="updateTitle(@Model.Lesson.IDLecon)" class="text-white w-full text-2xl font-bold bg-transparent p-2 rounded-lg mr-1 transition duration-300 ease-in-out hover:bg-gray-800 hover:text-gray-300 focus:bg-gray-800 focus:text-gray-300 focus:border-transparent focus:outline-none" value="@Model.Lesson.Intitule" placeholder="Cliquez pour ajouter un titre">
+    </div>
+    <div class="flex items-end justify-between">
+        <div class="w-3/5 flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white" class="w-4 h-4 mr-1">
+                <path d="M21.731 2.269a2.625 2.625 0 0 0-3.712 0l-1.157 1.157 3.712 3.712 1.157-1.157a2.625 2.625 0 0 0 0-3.712ZM19.513 8.199l-3.712-3.712-12.15 12.15a5.25 5.25 0 0 0-1.32 2.214l-.8 2.685a.75.75 0 0 0 .933.933l2.685-.8a5.25 5.25 0 0 0 2.214-1.32L19.513 8.2Z"/>
+            </svg>
+            <textarea id="description" onblur="updateDescription(@Model.Lesson.IDLecon)" class="text-white text-xs font-light bg-transparent p-2 w-full rounded-lg mr-1 overflow-y-hidden transition duration-300 ease-in-out hover:bg-gray-800 hover:text-gray-300 focus:bg-gray-800 focus:text-gray-300 focus:border-transparent focus:outline-none" placeholder="Cliquez pour ajouter une description">@Model.Lesson.Description</textarea>
+        </div>
+        <div class="w-2/5 flex items-center justify-end">
+            <select class="text-white text-xs bg-dark-blue border border-white rounded-lg px-3 py-2 mr-4" id="sortOrder" onchange="sortLessons()">
+                <option value="position">Trier par position</option>
+                <option value="title">Trier par titre</option>
+                <option value="status">Trier par status</option>
+            </select>
+            <button class="text-white text-xs font-bold bg-primary rounded-lg px-3 py-2" onclick="openModal()">Ajouter un exercice</button>
+        </div>
+    </div>
+    <div class="border border-white mt-3 opacity-50"></div>
+
+    @if (!Model.Exercises.Any())
+    {
+        <p class="text-white text-lg font-light">Aucun exercice n'a été ajouté à cette leçon.</p>
+    }
+    <div class="grid grid-cols-2 gap-4 mt-3">
+        <div>
+            @{
+                var halfCount = (int)Math.Ceiling(Model.Exercises.Count / 2.0);
+                var firstHalf = Model.Exercises.Take(halfCount);
+                var secondHalf = Model.Exercises.Skip(halfCount);
+            }
+            @foreach (var exercise in firstHalf)
+            {
+                await Html.RenderPartialAsync("Shared/_ExerciseCard", exercise);
+            }
+        </div>
+        <div>
+            @foreach (var exercise in secondHalf)
+            {
+                await Html.RenderPartialAsync("Shared/_ExerciseCard", exercise);
+            }
+        </div>
+    </div>
+</section>
+
+
+<form method="post"asp-page-handler="CreateExercise">
+    @Html.AntiForgeryToken()
+    <div id="confirmModal" class="hidden fixed items-center flex justify-center inset-0 bg-black bg-opacity-80 overflow-y-auto h-full w-full">
+        <div class="relative mx-auto p-5 w-96 shadow-lg rounded-md bg-dark-blue">
+            <div class="mt-3 text-center space-y-4">
+                <h3 class="text-xl font-bold text-white">Ajouter un exercice</h3>
+                <div class="flex justify-around px-7">
+                    <input asp-for="CreateExerciseInputModel.NewExerciseName" type="text" class="text-white text-xs font-light bg-transparent p-2 rounded-lg mr-1 transition duration-300 ease-in-out hover:bg-gray-800 hover:text-gray-300 focus:bg-gray-800 focus:text-gray-300 focus:border-transparent focus:outline-none" placeholder="Nom de la leçon" required>
+                </div>
+                <button id="confirmButton" type="submit" class="px-4 py-2 text-white font-medium bg-primary rounded-md hover:opacity-50">Confirmer</button>
+            </div>
+        </div>
+    </div>
+</form>
+
+@section Scripts {
+@if (TempData["ErrorMessage"] != null)
+{ 
+    <script>
+    toastr.error('@TempData["ErrorMessage"]');
+    </script>
+}
+<script>
+        function updateTitle(lessonId) {
+            var newTitle = document.getElementById('intitule').value;
+            var updateTitleInputModel = {
+                LessonId: lessonId,
+                Title: newTitle
+            };
+            $.ajax({
+                url: '?handler=UpdateTitle',
+                type: 'POST',
+                data: JSON.stringify(updateTitleInputModel),
+                contentType: 'application/json',
+                headers: {
+                    RequestVerificationToken: $('input:hidden[name="__RequestVerificationToken"]').val()
+                },
+                success: function (response) {
+                    if (response.success) {
+                        toastr.success('Le titre de la leçon a été mis à jour avec succès.');
+                    } else {
+                        toastr.error(response.message);
+                    }
+                },
+                error: function () {
+                    toastr.error('Une erreur s\'est produite lors de la mise à jour du titre de la leçon.');
+                }
+            });
+        }
+                function updateDescription(lessonId) {
+                    var newDescription = document.getElementById('description').value;
+                    var updateDescriptionInputModel = {
+                        LessonId: lessonId,
+                        NewDescription: newDescription
+                    };
+                    $.ajax({
+                        url: '?handler=UpdateDescription',
+                        type: 'POST',
+                        data: JSON.stringify(updateDescriptionInputModel),
+                        contentType: 'application/json',
+                        headers: {
+                            RequestVerificationToken: $('input:hidden[name="__RequestVerificationToken"]').val()
+                        },
+                        success: function (response) {
+                            if (response.success) {
+                                toastr.success('La description de la leçon a été mise à jour avec succès.');
+                            } else {
+                                toastr.error(response.message);
+                            }
+                        },
+                        error: function () {
+                            toastr.error('Une erreur s\'est produite lors de la mise à jour de la description de la leçon.');
+                        }
+                    });
+                }
+
+                function openModal() {
+                    document.getElementById('confirmModal').style.display = "flex";
+                }
+
+                function closeModal() {
+                    document.getElementById('confirmModal').style.display = "none";
+                }
+
+                function createExercise() {
+                    var newExerciseName = document.getElementById('newExerciseName').value;
+                }
+
+                document.getElementById('confirmModal').addEventListener('click', function(event) {
+                    if (event.target.id === 'confirmModal') {
+                        closeModal();
+                    }
+            });
+
+                function sortLessons() {
+                    var sortOrder = document.getElementById('sortOrder').value;
+                    window.location.href = `?sortOrder=${sortOrder}`;
+                }
+
+                document.getElementById('sortOrder').addEventListener('change', function() {
+                    var sortOrder = this.value;
+                    localStorage.setItem('sortOrder', sortOrder);
+                });
+
+                window.onload = function() {
+                    var sortOrder = localStorage.getItem('sortOrder');
+                    if (sortOrder) {
+                        document.getElementById('sortOrder').value = sortOrder;
+                    }
+                };
+            </script>
+}

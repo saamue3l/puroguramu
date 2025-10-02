@@ -1,0 +1,28 @@
+﻿<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>@ViewData["Title"]</title>
+    <link rel="icon" href="~/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="~/css/output.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css"/>
+</head>
+<body class="font-sans flex flex-col bg-dark-blue h-screen">
+<header class="header flex justify-center border-b border-white-50 bg-dark-blue py-2">
+    <div class="w-4/5 flex justify-between items-center ">
+        <a asp-page="/Index" class="flex items-center text-black no-underline mr-2 ml-2">
+            <img src="~/puroLogoW.png" alt="Logo" class="w-7 h-7"/>
+            <p class="ml-2 text-white font-bold">Puroguramu</p>
+        </a>
+    </div>
+</header>
+<main class="main w-full h-screen flex flex-col items-center bg-dark-blue flex-grow">
+    @RenderBody()
+</main>
+<footer class="footer flex justify-center items-center text-xs bg-dark-blue text-white p-1">
+    <p>© 2024 Puroguramu</p>
+</footer>
+@await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

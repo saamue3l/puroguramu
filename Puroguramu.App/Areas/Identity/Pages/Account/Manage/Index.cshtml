@@ -1,0 +1,59 @@
+﻿@page "/modifier-profil"
+@model IndexModel
+@{
+    ViewData["Title"] = "Modifier le profil";
+    ViewData["ActivePage"] = ManageNavPages.Index;
+}
+
+<div class="flex items-center justify-center h-full w-full">
+    <div class="relative mx-auto p-5 w-1/3 rounded-md bg-dark-blue">
+        <div class="mt-3 text-center">
+            <h3 class="text-xl font-bold text-white">Modifier votre profil</h3>
+            <div class="mt-3 px-7">
+                <form method="post" enctype="multipart/form-data">
+                    <div asp-validation-summary="ModelOnly" class="text-red-600 text-xs"></div>
+                    <div class="flex flex-col items-start">
+                        <label asp-for="Input.Email" class="text-white font-bold text-xs"></label>
+                        <input asp-for="Input.Email" class="mt-2 p-2 w-full text-white border border-grey border-opacity-50 bg-dark-blue rounded-md hover:border-opacity-70 focus:border-primary focus:outline-none focus:ring-0"/>
+                        <span asp-validation-for="Input.Email" class="text-red-600 text-xs"></span>
+                    </div>
+                    <div class="mt-3 flex justify-between w-full">
+                        <div class="flex flex-col items-start mr-1 w-1/2">
+                            <label asp-for="Input.Nom" class="text-white font-bold text-xs"></label>
+                            <input asp-for="Input.Nom" class="mt-2 p-2  w-full text-white border border-grey border-opacity-50 bg-dark-blue rounded-md hover:border-opacity-70 focus:border-primary focus:outline-none focus:ring-0" autocomplete="username" aria-required="true"/>
+                            <span asp-validation-for="Input.Nom" class="text-red-600 text-xs"></span>
+                        </div>
+                        <div class="flex flex-col items-start ml-1 w-1/2">
+                            <label asp-for="Input.Prenom" class="text-white font-bold text-xs"></label>
+                            <input asp-for="Input.Prenom" class="mt-2 p-2  w-full text-white border border-grey border-opacity-50 bg-dark-blue rounded-md hover:border-opacity-70 focus:border-primary focus:outline-none focus:ring-0" autocomplete="username" aria-required="true"/>
+                            <span asp-validation-for="Input.Prenom" class="text-red-600 text-xs"></span>
+                        </div>
+                    </div>
+                    <div class="mt-3 flex justify-between w-full">
+                        <div class="flex flex-col items-start mr-1 w-1/2">
+                            <p class="text-white font-bold text-xs">Matricule</p>
+                            <div class="flex justify-start mt-2 p-2 w-full text-white border border-grey border-opacity-50 bg-white-50 bg-opacity-50 rounded-md">
+                                @Model.Input.Matricule
+                            </div>
+                        </div>
+                        <div class="flex flex-col items-start ml-1 w-1/2">
+                            <label asp-for="Input.IDGroupe" class="text-white font-bold text-xs"></label>
+                            <select asp-for="Input.IDGroupe" asp-items='ViewData["Groupes"] as SelectList' class="mt-2 p-2 w-full text-white border border-grey border-opacity-50 bg-dark-blue rounded-md hover:border-opacity-70 focus:border-primary focus:outline-none focus:ring-0"></select>
+                            <span asp-validation-for="Input.IDGroupe" class="text-red-600 text-xs"></span>
+                        </div>
+                    </div>
+                    <div class="mt-3 flex flex-col items-start">
+                        <label asp-for="Input.ProfileImage" class="text-white font-bold text-xs">Photo de profil</label>
+                        <input asp-for="Input.ProfileImage" type="file" class="mt-2 p-2 w-full text-white border border-grey border-opacity-50 bg-dark-blue rounded-md hover:border-opacity-70 focus:border-primary focus:outline-none focus:ring-0"/>
+                        <span asp-validation-for="Input.ProfileImage" class="text-red-600 text-xs"></span>
+                    </div>
+                    <button type="submit" class="mt-8 mb-2 w-full px-4 py-2 bg-primary text-white rounded-md hover:opacity-50">Enregistrer les modifications</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial"/>
+}

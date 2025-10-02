@@ -1,0 +1,95 @@
+﻿@page "/tableau-de-bord-etudiant"
+@model Puroguramu.App.Pages.Students.Index
+@{
+    ViewBag.Title = "Accueil";
+}
+
+<section class="w-4/5">
+    <div class="flex justify-between items-end mt-24">
+        <p class="text-white text-2xl font-bold m-0 p-O">Tableau de bord</p>
+        <div class="flex items-center">
+            @if (Model.LastAttemptedExercise != null)
+            {
+            <a class="text-white text-xs font-bold bg-primary rounded-lg px-3 py-2 hover:opacity-50 inline-block mr-4" asp-page-handler="ContinueExercise">Continuer exercice</a>
+            }
+            else
+            {
+            <span class="text-white text-xs font-bold bg-primary rounded-lg px-3 py-2 opacity-50 inline-block mr-4">Continuer exercice</span>
+            }
+            @if (Model.NextExercise != null)
+            {
+                <a class="text-white text-xs font-bold bg-primary rounded-lg px-3 py-2 hover:opacity-50 inline-block" asp-page-handler="NextExercise">Prochain exercice</a>
+            }
+            else
+            {
+                <span class="text-white text-xs font-bold bg-primary rounded-lg px-3 py-2 opacity-50 inline-block">Prochain exercice</span>
+            }
+        </div>
+    </div>
+
+    <div class="border border-white mt-3 opacity-50"></div>
+
+    @if (!Model.Lessons.Any())
+    {
+        <p class="text-white text-lg font-light">Aucunes leçons</p>
+    }
+    <div class="grid grid-cols-2 gap-4 mt-3">
+        @{
+            var halfCount = (int)Math.Ceiling(Model.Lessons.Count / 2.0);
+            var firstHalf = Model.Lessons.Take(halfCount);
+            var secondHalf = Model.Lessons.Skip(halfCount);
+        }
+        <div>
+            @foreach (var lesson in firstHalf)
+            {
+                <a asp-page="/Students/ConsultLesson" asp-route-lessonId="@lesson.Lesson.IDLecon">
+                    <div class="bg-gray-900 py-2 rounded-lg mb-2 relative hover:opacity-50 cursor-pointer">
+                        <div class="flex items-start w-full">
+                            <div class="w-10 flex justify-center text-gray-500 text-xl font-light">@lesson.Lesson.Position</div>
+                            <div class="w-full">
+                                <div class="flex justify-between items-center text-white text-xl font-light">
+                                    <p>@lesson.Lesson.Intitule</p>
+                                    <p class="italic"><span class="text-primary">@lesson.CompletedExercises</span>/@lesson.TotalExercises</p>
+                                </div>
+                                <div class="flex text-primary pt-3 pb-2 items-center w-full">
+                                    <div class="w-full bg-white h-2 rounded-full">
+                                        <div class="bg-primary h-2 rounded-full" style="width: @(lesson.TotalExercises > 0 ? (int)(((double)lesson.CompletedExercises / lesson.TotalExercises) * 100) : 0)%" id="progress-bar"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <span class="w-10"></span>
+                        </div>
+                    </div>
+                </a>
+            }
+        </div>
+        <div>
+            @foreach (var lesson in secondHalf)
+            {
+                <a asp-page="/Students/ConsultLesson" asp-route-lessonId="@lesson.Lesson.IDLecon">
+                    <div class="bg-gray-900 py-2 rounded-lg mb-2 relative hover:opacity-50 cursor-pointer">
+                        <div class="flex items-start w-full">
+                            <div class="w-10 flex justify-center text-gray-500 text-xl font-light">@lesson.Lesson.Position</div>
+                            <div class="w-full">
+                                <div class="flex justify-between items-center text-white text-xl font-light">
+                                    <p>@lesson.Lesson.Intitule</p>
+                                    <p class="italic"><span class="text-primary">@lesson.CompletedExercises</span>/@lesson.TotalExercises</p>
+                                </div>
+                                <div class="flex text-primary pt-3 pb-2 items-center w-full">
+                                    <div class="w-full bg-white h-2 rounded-full">
+                                        <div class="bg-primary h-2 rounded-full" style="width: @(lesson.TotalExercises > 0 ? (int)(((double)lesson.CompletedExercises / lesson.TotalExercises) * 100) : 0)%" id="progress-bar"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <span class="w-10"></span>
+                        </div>
+                    </div>
+                </a>
+            }
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+
+}

@@ -1,0 +1,43 @@
+﻿@page "/connexion"
+@model LoginModel
+
+@{
+    Layout = "~/Pages/Shared/_MinimalistLayout.cshtml";
+    ViewData["Title"] = "Connexion";
+}
+
+<div class="flex items-center justify-center h-full w-full">
+    <div class="relative mx-auto p-5 w-96 rounded-md bg-dark-blue">
+        <div class="mt-3 text-center">
+            <h3 class="text-xl font-bold text-white">Connexion</h3>
+            <div class="mt-4 px-7">
+                <form id="account" method="post">
+                    <div asp-validation-summary="ModelOnly" class="text-red-600 text-xs"></div>
+                    <div class="flex flex-col items-start">
+                        <label asp-for="Input.Username" class="text-white font-bold text-xs"></label>
+                        <input asp-for="Input.Username" class="mt-2 p-2 w-full text-white border border-grey border-opacity-50 bg-dark-blue rounded-md hover:border-opacity-70 focus:border-primary focus:outline-none focus:ring-0" autocomplete="username" aria-required="true"/>
+                        <span asp-validation-for="Input.Username" class="text-red-600 text-xs"></span>
+                    </div>
+                    <div class="flex flex-col items-start mt-4">
+                        <label asp-for="Input.Password" class="text-white font-bold text-xs"></label>
+                        <input asp-for="Input.Password" class="mt-2 p-2 w-full text-white border border-grey border-opacity-50 bg-dark-blue rounded-md hover:border-opacity-70 focus:border-primary focus:outline-none focus:ring-0" autocomplete="current-password" aria-required="true"/>
+                        <span asp-validation-for="Input.Password" class="text-red-600 text-xs"></span>
+                    </div>
+                    <div>
+                        <button id="login-submit" type="submit" class="mt-8 mb-2 w-full px-4 py-2 bg-primary text-white rounded-md hover:opacity-50">Se connecter</button>
+                    </div>
+                </form>
+                <a asp-area="Identity" asp-page="/Account/Register">
+                    <div class="w-full flex justify-start text-primary text-xs opacity-50 hover:opacity-100">
+                        Pas de compte ? Inscrivez-vous
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial"/>
+}

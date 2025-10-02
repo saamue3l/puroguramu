@@ -1,0 +1,79 @@
+@using Microsoft.AspNetCore.Identity
+@using Puroguramu.Infrastructures.DbContexts
+
+@inject SignInManager<PuroUser> SignInManager
+@inject UserManager<PuroUser> UserManager
+
+@{
+    var user = await UserManager.GetUserAsync(User);
+    var hasProfileImage = user?.Image != null;
+}
+
+@if (SignInManager.IsSignedIn(User))
+{
+    <div class="relative">
+        <button id="profileMenuButton" class="flex items-center hover:opacity-50 focus:outline-none">
+            @if (hasProfileImage)
+            {
+                <img src="@Url.Content($"~/{user?.Image}")" alt="Profile Image" class="w-7 h-7 rounded-full"/>
+            }
+            else
+            {
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="white" class="w-7 h-7">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/>
+                </svg>
+            }
+        </button>
+        <div id="profileMenuDropdown" class="hidden absolute right-0 mt-2 bg-white shadow-xl rounded-lg z-50">
+            <div class="px-2 pt-2">
+                <a asp-page="/UserProfile">
+                    <div class="flex items-center text-sm px-2 py-1 text-black hover:bg-gray-300 hover:rounded-md">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="black" class="w-4 h-4">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
+                        </svg>
+                        <p class="ml-1">Profil</p>
+                    </div>
+                </a>
+            </div>
+            <div class="px-2 pb-2">
+                <a asp-page="/Account/Logout" asp-area="Identity" >
+                    <div class="flex items-center text-sm px-2 py-1 text-black hover:bg-gray-300 hover:rounded-md">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="black" class="w-4 h-4">
+                            <path fill-rule="evenodd" d="M16.5 3.75a1.5 1.5 0 0 1 1.5 1.5v13.5a1.5 1.5 0 0 1-1.5 1.5h-6a1.5 1.5 0 0 1-1.5-1.5V15a.75.75 0 0 0-1.5 0v3.75a3 3 0 0 0 3 3h6a3 3 0 0 0 3-3V5.25a3 3 0 0 0-3-3h-6a3 3 0 0 0-3 3V9A.75.75 0 1 0 9 9V5.25a1.5 1.5 0 0 1 1.5-1.5h6ZM5.78 8.47a.75.75 0 0 0-1.06 0l-3 3a.75.75 0 0 0 0 1.06l3 3a.75.75 0 0 0 1.06-1.06l-1.72-1.72H15a.75.75 0 0 0 0-1.5H4.06l1.72-1.72a.75.75 0 0 0 0-1.06Z" clip-rule="evenodd" />
+                        </svg>
+                        <p class="ml-1">Déconnexion</p>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+}
+
+<script>
+    window.addEventListener('beforeunload', function () {
+        let profileMenuDropdown = document.getElementById('profileMenuDropdown');
+        if (!profileMenuDropdown.classList.contains('hidden')) {
+            profileMenuDropdown.classList.add('hidden');
+        }
+    });
+
+document.addEventListener('DOMContentLoaded', function () {
+    let profileMenuButton = document.getElementById('profileMenuButton');
+    let profileMenuDropdown = document.getElementById('profileMenuDropdown');
+
+    profileMenuButton.addEventListener('click', function (event) {
+        profileMenuDropdown.classList.toggle('hidden');
+        event.stopPropagation();
+    });
+
+    document.addEventListener('click', function (event) {
+        let isClickInside = profileMenuButton.contains(event.target) || profileMenuDropdown.contains(event.target);
+
+        if (!isClickInside && !profileMenuDropdown.classList.contains('hidden')) {
+            profileMenuDropdown.classList.add('hidden');
+        }
+    });
+});
+
+
+</script>

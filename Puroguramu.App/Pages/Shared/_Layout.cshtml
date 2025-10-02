@@ -1,0 +1,112 @@
+﻿<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>@ViewData["Title"]</title>
+    <link rel="icon" href="~/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="~/css/output.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css"/>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.12/ace.js" crossorigin="anonymous"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <style>
+        .toast {
+            opacity: 1 !important;
+            box-shadow: none !important;
+        }
+
+        #toast-container > div {
+            opacity: 1 !important;
+            box-shadow: none !important;
+        }
+
+        #toast-container > .toast-success {
+            background-color: #9780E5;
+            color: white;
+            font-size: 16px;
+        }
+
+        #toast-container > .toast-error {
+            background-color: #BD362F;
+            color: white;
+            font-size: 16px;
+        }
+
+        #toast-container > .toast-info {
+            background-color: #9780E5;
+            color: white;
+            font-size: 16px;
+        }
+
+        #toast-container > .toast-warning {
+            background-color: #BD362F;
+            color: white;
+            font-size: 16px;
+        }
+    </style>
+
+</head>
+<body class="font-sans flex flex-col bg-dark-blue h-screen">
+<header class="header flex justify-center border-b border-white-50 bg-dark-blue py-2">
+    <div class="w-4/5 flex justify-between items-center ">
+        @{
+            var path = "/Index";
+            if (User.Identity is { IsAuthenticated: true })
+            {
+                if (User.IsInRole("Etudiant"))
+                {
+                    path = "/Students/Index";
+                }
+                else if (User.IsInRole("Enseignant"))
+                {
+                    path = "/Teachers/Index";
+                }
+            }
+        }
+
+        <a asp-page="@path" class="flex items-center text-black no-underline mr-2 ml-2">
+            <img src="~/puroLogoW.png" alt="Logo" class="w-7 h-7"/>
+            <p class="ml-2 text-white font-bold">Puroguramu</p>
+        </a>
+
+        <partial name="_LoginPartial"/>
+    </div>
+</header>
+<main class="main w-full h-screen flex flex-col items-center bg-dark-blue flex-grow">
+
+    @RenderBody()
+</main>
+<footer class="footer flex justify-center items-center text-xs bg-dark-blue text-white p-1">
+    <p>© 2024 Puroguramu</p>
+</footer>
+@await RenderSectionAsync("Scripts", required: false)
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+<script>
+    toastr.options = {
+        "closeButton": true,
+        "debug": false,
+        "newestOnTop": false,
+        "progressBar": true,
+        "positionClass": "toast-bottom-right",
+        "preventDuplicates": true,
+        "onclick": null,
+        "showDuration": "300",
+        "hideDuration": "1000",
+        "timeOut": "5000",
+        "extendedTimeOut": "1000",
+        "showEasing": "swing",
+        "hideEasing": "linear",
+        "showMethod": "fadeIn",
+        "hideMethod": "fadeOut"
+    }
+</script>
+@if (TempData["NotificationScript"] != null)
+{
+    <script>
+    @Html.Raw(TempData["NotificationScript"])
+</script>
+}
+</body>
+</html>
