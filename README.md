@@ -4,11 +4,9 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![ASP.NET Core](https://img.shields.io/badge/ASP.NET%20Core-6.0-blueviolet)](https://docs.microsoft.com/aspnet/core)
 
-Plateforme d'apprentissage C# développée en 2024 dans le cadre d'un projet de groupe de bloc 2 axé sur le framework .NET Core. Permet aux étudiants de progresser à travers des leçons structurées et aux enseignants de gérer le contenu pédagogique.
-
 ## Contexte du projet
 
-Projet académique en binôme réalisé en 2024 pour l'apprentissage du framework .NET Core (ASP.NET Core, Entity Framework Core, Identity). Conçu pour faciliter l'enseignement de C# avec un système de leçons progressives et d'exercices auto-corrigés.
+Plateforme d'apprentissage C# développée en binôme en 2024 dans le cadre d'un projet de bloc 2 visant à maîtriser ASP.NET Core. Le projet permet aux étudiants de progresser à travers des leçons structurées avec compilation de code en temps réel, et aux enseignants de gérer le contenu pédagogique. Technologies explorées : ASP.NET Core Razor Pages, Entity Framework Core, ASP.NET Identity et Roslyn.
 
 ## Fonctionnalités
 
@@ -46,6 +44,7 @@ Projet académique en binôme réalisé en 2024 pour l'apprentissage du framewor
 
 ### 1. Cloner le repository
 git clone https://github.com/saamue31/puroguramu.git
+
 cd puroguramu/Puroguramu.App
 
 ### 2. Installer l'outil EF Core
@@ -53,12 +52,13 @@ dotnet tool install --global dotnet-ef --version 6.0.36
 
 ### 3. Créer la base de données
 mkdir Data
+
 dotnet ef database update --context PuroguramuDbContext
 
 ### 4. Lancer l'application
 dotnet run
 
-L'application sera accessible sur `https://localhost:7291`.
+L'application sera accessible sur le port affiché dans le terminal.
 
 ## Comptes par défaut
 
