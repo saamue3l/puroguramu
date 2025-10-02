@@ -71,6 +71,7 @@ Deux comptes de démonstration sont créés automatiquement au premier lancement
 
 ## Structure du projet
 
+```
 puroguramu/
 ├── Puroguramu.App/               # Application web (Razor Pages)
 ├── Puroguramu.Domains/           # Modèles métier et interfaces
@@ -79,5 +80,6 @@ puroguramu/
 │   ├── Migrations/               # Migrations de base de données
 │   ├── Repositories/             # Accès aux données
 │   └── Roslyn/                   # Compilateur C# dynamique
+```
 
 Projet académique - HELMO (2024)
