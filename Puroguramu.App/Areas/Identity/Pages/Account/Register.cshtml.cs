@@ -153,7 +153,8 @@ namespace Puroguramu.App.Areas.Identity.Pages.Account
 
                     await _signInManager.SignInAsync(user, isPersistent: false);
 
-                    TempData["NotificationScript"] = $"toastr.success('Inscription réussie!');";
+                    TempData["NotificationType"] = "success";
+                    TempData["NotificationMessage"] = "Inscription réussie!";
 
                     return RedirectToPage("/Students/Index");
                 }

@@ -126,7 +126,8 @@ namespace Puroguramu.App.Areas.Identity.Pages.Account
                 {
                     var roles = await _userManager.GetRolesAsync(user);
 
-                    TempData["NotificationScript"] = $"toastr.success('Connexion réussie!');";
+                    TempData["NotificationType"] = "success";
+                    TempData["NotificationMessage"] = "Connexion réussie!";
                     if (roles.Contains("Etudiant"))
                     {
                         await _signInManager.SignInAsync(user, isPersistent: false);

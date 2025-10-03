@@ -102,11 +102,11 @@
         "hideMethod": "fadeOut"
     }
 </script>
-@if (TempData["NotificationScript"] != null)
+@if (TempData["NotificationType"] != null && TempData["NotificationMessage"] != null)
 {
     <script>
-    @Html.Raw(TempData["NotificationScript"])
-</script>
+        toastr.@(TempData["NotificationType"])('@Html.Raw(System.Text.Encodings.Web.JavaScriptEncoder.Default.Encode(TempData["NotificationMessage"].ToString()))');
+    </script>
 }
 </body>
 </html>

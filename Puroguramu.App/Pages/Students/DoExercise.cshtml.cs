@@ -154,7 +154,8 @@ public class DoExercise : PageModel
             _progresRepository.UpdateProgresStatus(exerciseId, userId, 4);
         }
 
-        TempData["NotificationScript"] = $"toastr.error('Exercice abandonné.');";
+        TempData["NotificationType"] = "error";
+        TempData["NotificationMessage"] = "Exercice abandonné.";
 
         return RedirectToPage(new { lessonId, exerciseId });
     }

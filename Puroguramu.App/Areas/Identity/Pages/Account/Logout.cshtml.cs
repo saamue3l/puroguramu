@@ -45,7 +45,8 @@ namespace Puroguramu.App.Areas.Identity.Pages.Account
             returnUrl ??= Url.Content("~/");
             _logger.LogInformation("Logout apres URL");
 
-            TempData["NotificationScript"] = $"toastr.success('Déconnexion confirmée!');";
+            TempData["NotificationType"] = "success";
+            TempData["NotificationMessage"] = "Déconnexion confirmée!";
 
             await _signInManager.SignOutAsync();
             _logger.LogInformation("Logout apres signout");

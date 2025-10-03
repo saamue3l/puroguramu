@@ -67,7 +67,7 @@
         modeleEditor.setTheme("ace/theme/dracula");
         modeleEditor.session.setMode("ace/mode/csharp");
         modeleEditor.setOption("showPrintMargin", false);
-        var modele = @Html.Raw(Json.Serialize(Model.ExerciseObject.Modele));
+        var modele = @Json.Serialize(Model.ExerciseObject.Modele);
         if (modele) {
             modeleEditor.session.setValue(modele);
         } else {
@@ -78,7 +78,7 @@
         solutionEditor.setTheme("ace/theme/dracula");
         solutionEditor.session.setMode("ace/mode/csharp");
         solutionEditor.setOption("showPrintMargin", false);
-        var solution = @Html.Raw(Json.Serialize(Model.ExerciseObject.Solution));
+        var solution = @Json.Serialize(Model.ExerciseObject.Solution);
         if (solution) {
             solutionEditor.session.setValue(solution);
         } else {

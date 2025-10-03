@@ -152,7 +152,8 @@ namespace Puroguramu.App.Areas.Identity.Pages.Account.Manage
             await _userManager.UpdateAsync(user);
             await _signInManager.RefreshSignInAsync(user);
 
-            TempData["NotificationScript"] = $"toastr.success('Modification(s) validée(s)!');";
+            TempData["NotificationType"] = "success";
+            TempData["NotificationMessage"] = "Modification(s) validée(s)!";
 
             return RedirectToPage();
         }
