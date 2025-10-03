@@ -14,7 +14,6 @@ using Puroguramu.Infrastructures.Repositories;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddRazorPages();
-builder.Services.AddScoped<ILogger, Logger<object>>();
 builder.Services.AddScoped<ReverseProxyLinksMiddleware>();
 builder.Services.AddScoped<IExerciseRepository, DummyExerciseRepository>();
 builder.Services.AddScoped<IAssessExercise, RoslynAssessor>();
