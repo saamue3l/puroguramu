@@ -6,6 +6,6 @@ namespace Puroguramu.Infrastructures.Dummies;
 
 public class DummyExerciseRepository : IExerciseRepository
 {
-    public Exercise GetExercise(int exerciseId)
-        => new Exercise();
+    public Task<Exercise> GetExerciseAsync(int exerciseId)
+        => Task.FromResult(new Exercise());
 }

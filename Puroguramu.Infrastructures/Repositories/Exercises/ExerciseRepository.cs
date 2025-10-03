@@ -1,4 +1,5 @@
-﻿using Puroguramu.Domains;
+﻿using Microsoft.EntityFrameworkCore;
+using Puroguramu.Domains;
 using Puroguramu.Domains.Models;
 using Puroguramu.Domains.Repositories;
 using Puroguramu.Infrastructures.DbContexts;
@@ -15,9 +16,9 @@ public class ExerciseRepository : IExerciseRepository
         _context = context;
     }
 
-    public Exercise GetExercise(int exerciseId)
+    public async Task<Exercise> GetExerciseAsync(int exerciseId)
     {
-        return _context.Exercises
-            .FirstOrDefault(e => e.IDExercice == exerciseId);
+        return await _context.Exercises
+            .FirstOrDefaultAsync(e => e.IDExercice == exerciseId);
     }
 }

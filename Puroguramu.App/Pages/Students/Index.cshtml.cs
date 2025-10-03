@@ -29,18 +29,18 @@ public class Index : PageModel
     public async Task<IActionResult> OnGetAsync()
     {
         var userId = _userManager.GetUserId(User);
-        var lessons = _repository.GetAllLessons().Where(lesson => lesson.IDStatut == 2);
+        var lessons = (await _repository.GetAllLessonsAsync()).Where(lesson => lesson.IDStatut == 2);
         Lessons = new List<(Lesson, int, int)>();
 
         foreach (var lesson in lessons)
         {
-            var (totalExercises, completedExercises) = _repository.GetLessonProgress(lesson.IDLecon, userId);
+            var (totalExercises, completedExercises) = await _repository.GetLessonProgressAsync(lesson.IDLecon, userId);
             Lessons.Add((lesson, totalExercises, completedExercises));
         }
 
-        NextExercise = _repository.GetNextUncompletedExercise(userId);
+        NextExercise = await _repository.GetNextUncompletedExerciseAsync(userId);
 
-        LastAttemptedExercise = _repository.GetLastAttemptedExercise(userId);
+        LastAttemptedExercise = await _repository.GetLastAttemptedExerciseAsync(userId);
 
         return Page();
     }
@@ -48,7 +48,7 @@ public class Index : PageModel
     public async Task<IActionResult> OnGetNextExerciseAsync()
     {
         var userId = _userManager.GetUserId(User);
-        var nextExercise = _repository.GetNextUncompletedExercise(userId);
+        var nextExercise = await _repository.GetNextUncompletedExerciseAsync(userId);
 
         if (nextExercise != null)
         {
@@ -61,7 +61,7 @@ public class Index : PageModel
     public async Task<IActionResult> OnGetContinueExerciseAsync()
     {
         var userId = _userManager.GetUserId(User);
-        var continueExercise = _repository.GetLastAttemptedExercise(userId);
+        var continueExercise = await _repository.GetLastAttemptedExerciseAsync(userId);
 
         if (continueExercise != null)
         {

@@ -4,5 +4,5 @@ namespace Puroguramu.Domains.Repositories;
 
 public interface IExerciseRepository
 {
-    Exercise GetExercise(int exerciseId);
+    Task<Exercise> GetExerciseAsync(int exerciseId);
 }

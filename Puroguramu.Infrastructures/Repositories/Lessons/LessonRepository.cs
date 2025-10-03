@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Puroguramu.Domains.Models;
 using Puroguramu.Domains;
 using Puroguramu.Domains.Repositories;
@@ -20,37 +21,34 @@ namespace Puroguramu.Infrastructures
             _userManager = userManager;
         }
 
-        public Lesson GetLesson(int lessonId)
+        public async Task<Lesson> GetLessonAsync(int lessonId)
         {
-            return _database.Lessons.Find(lessonId);
+            return await _database.Lessons.FindAsync(lessonId);
         }
 
-        public IEnumerable<Exercise> GetExercisesForLesson(int lessonId)
+        public async Task<IEnumerable<Exercise>> GetExercisesForLessonAsync(int lessonId)
         {
-            return _database.Exercises.Where(e => e.IDLecon == lessonId).OrderBy(e => e.Position).ToList();
+            return await _database.Exercises.Where(e => e.IDLecon == lessonId).OrderBy(e => e.Position).ToListAsync();
         }
 
-        public IEnumerable<Exercise> GetExercisesForLessonStudent(int lessonId)
+        public async Task<IEnumerable<Exercise>> GetExercisesForLessonStudentAsync(int lessonId)
         {
-            return _database.Exercises.Where(e => e.IDLecon == lessonId && e.IDStatut == 2).OrderBy(e => e.Position).ToList();
+            return await _database.Exercises.Where(e => e.IDLecon == lessonId && e.IDStatut == 2).OrderBy(e => e.Position).ToListAsync();
         }
 
-        public List<Lesson> GetAllLessons()
+        public async Task<List<Lesson>> GetAllLessonsAsync()
         {
-            return _database.Lessons.OrderBy(l => l.Position).ToList();
+            return await _database.Lessons.OrderBy(l => l.Position).ToListAsync();
         }
 
-        public int GetNbStudentHasCompletedLesson(int lessonId)
+        public async Task<int> GetNbStudentHasCompletedLessonAsync(int lessonId)
         {
-            // Récupérer tous les exercices pour la leçon donnée
-            var exercises = _database.Exercises.Where(e => e.IDLecon == lessonId).ToList();
+            var exercises = await _database.Exercises.Where(e => e.IDLecon == lessonId).ToListAsync();
 
-            // Récupérer tous les utilisateurs ayant le rôle d'étudiant
-            var students = _userManager.GetUsersInRoleAsync("Etudiant").Result;
+            var students = await _userManager.GetUsersInRoleAsync("Etudiant");
 
             int count = 0;
 
-            // Pour chaque étudiant, vérifier si tous les exercices de la leçon ont été terminés
             foreach (var student in students)
             {
                 bool allExercisesCompleted = exercises.All(e => _database.Progress.Any(p => p.IDExercice == e.IDExercice && p.IDUtilisateur == student.Id && p.IDStatut == 3 || p.IDStatut == 4));
@@ -63,15 +61,15 @@ namespace Puroguramu.Infrastructures
             return count;
         }
 
-        public int GetTotalStudents()
+        public async Task<int> GetTotalStudentsAsync()
         {
-            var students = _userManager.GetUsersInRoleAsync("Etudiant").Result;
+            var students = await _userManager.GetUsersInRoleAsync("Etudiant");
             return students.Count;
         }
 
-        public (int TotalExercises, int CompletedExercises) GetLessonProgress(int lessonId, string userId)
+        public async Task<(int TotalExercises, int CompletedExercises)> GetLessonProgressAsync(int lessonId, string userId)
         {
-            var exercisesForLesson = _database.Exercises.Where(e => e.IDLecon == lessonId && e.IDStatut == 2).ToList();
+            var exercisesForLesson = await _database.Exercises.Where(e => e.IDLecon == lessonId && e.IDStatut == 2).ToListAsync();
 
             var totalExercises = exercisesForLesson.Count;
 
@@ -80,11 +78,11 @@ namespace Puroguramu.Infrastructures
             return (totalExercises, completedExercises);
         }
 
-        public Exercise GetNextExercise(int currentLessonId, int currentExerciseId)
+        public async Task<Exercise> GetNextExerciseAsync(int currentLessonId, int currentExerciseId)
         {
-            var currentExercise = _database.Exercises.Find(currentExerciseId);
+            var currentExercise = await _database.Exercises.FindAsync(currentExerciseId);
 
-            var exercisesForCurrentLesson = _database.Exercises.Where(e => e.IDLecon == currentLessonId).OrderBy(e => e.Position).ToList();
+            var exercisesForCurrentLesson = await _database.Exercises.Where(e => e.IDLecon == currentLessonId).OrderBy(e => e.Position).ToListAsync();
 
             var currentIndex = exercisesForCurrentLesson.FindIndex(e => e.IDExercice == currentExerciseId);
 
@@ -93,24 +91,24 @@ namespace Puroguramu.Infrastructures
                 return exercisesForCurrentLesson[currentIndex + 1];
             }
 
-            var nextLesson = _database.Lessons.Where(l => l.IDLecon > currentLessonId).OrderBy(l => l.IDLecon).FirstOrDefault();
+            var nextLesson = await _database.Lessons.Where(l => l.IDLecon > currentLessonId).OrderBy(l => l.IDLecon).FirstOrDefaultAsync();
 
             if (nextLesson != null)
             {
-                return _database.Exercises.Where(e => e.IDLecon == nextLesson.IDLecon).OrderBy(e => e.Position).FirstOrDefault();
+                return await _database.Exercises.Where(e => e.IDLecon == nextLesson.IDLecon).OrderBy(e => e.Position).FirstOrDefaultAsync();
             }
 
             return null;
         }
 
-        public Exercise GetNextUncompletedExercise(string userId)
+        public async Task<Exercise> GetNextUncompletedExerciseAsync(string userId)
         {
-            var allExercises = _database.Exercises.Where(e => e.IDStatut == 2).OrderBy(e => e.IDLecon).ThenBy(e => e.Position).ToList();
+            var allExercises = await _database.Exercises.Where(e => e.IDStatut == 2).OrderBy(e => e.IDLecon).ThenBy(e => e.Position).ToListAsync();
 
             foreach (var exercise in allExercises)
             {
 
-                var progress = _database.Progress.FirstOrDefault(p => p.IDExercice == exercise.IDExercice && p.IDUtilisateur == userId);
+                var progress = await _database.Progress.FirstOrDefaultAsync(p => p.IDExercice == exercise.IDExercice && p.IDUtilisateur == userId);
 
                 if (progress == null || (progress.IDStatut != 3 && progress.IDStatut != 4))
                 {
@@ -121,16 +119,16 @@ namespace Puroguramu.Infrastructures
             return null;
         }
 
-        public Exercise GetLastAttemptedExercise(string userId)
+        public async Task<Exercise> GetLastAttemptedExerciseAsync(string userId)
         {
-            var lastProgress = _database.Progress
+            var lastProgress = await _database.Progress
                 .Where(p => p.IDUtilisateur == userId &&  p.IDStatut == 2)
                 .OrderByDescending(p => p.DateDerniereTentative)
-                .FirstOrDefault();
+                .FirstOrDefaultAsync();
 
             if (lastProgress != null)
             {
-                return _database.Exercises.Find(lastProgress.IDExercice);
+                return await _database.Exercises.FindAsync(lastProgress.IDExercice);
             }
 
             return null;

@@ -1,4 +1,5 @@
-﻿using Puroguramu.Domains.Models;
+﻿using Microsoft.EntityFrameworkCore;
+using Puroguramu.Domains.Models;
 using Puroguramu.Domains.Repositories;
 using Puroguramu.Infrastructures.DbContexts;
 
@@ -13,83 +14,83 @@ public class UpdateExerciseRepository : IUpdateExerciseRepository
         _context = context;
     }
 
-    public void MoveExerciseUp(int exerciseId)
+    public async Task MoveExerciseUpAsync(int exerciseId)
     {
-        var exercise = _context.Exercises.Find(exerciseId);
-        var previousExercise = _context.Exercises.FirstOrDefault(e => e.Position == exercise.Position - 1 && e.IDLecon == exercise.IDLecon);
+        var exercise = await _context.Exercises.FindAsync(exerciseId);
+        var previousExercise = await _context.Exercises.FirstOrDefaultAsync(e => e.Position == exercise.Position - 1 && e.IDLecon == exercise.IDLecon);
         if (previousExercise != null)
         {
             previousExercise.Position += 1;
             exercise.Position -= 1;
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
         }
     }
 
-    public void MoveExerciseDown(int exerciseId)
+    public async Task MoveExerciseDownAsync(int exerciseId)
     {
-        var exercise = _context.Exercises.Find(exerciseId);
-        var nextExercise = _context.Exercises.FirstOrDefault(e => e.Position == exercise.Position + 1 && e.IDLecon == exercise.IDLecon);
+        var exercise = await _context.Exercises.FindAsync(exerciseId);
+        var nextExercise = await _context.Exercises.FirstOrDefaultAsync(e => e.Position == exercise.Position + 1 && e.IDLecon == exercise.IDLecon);
         if (nextExercise != null)
         {
             nextExercise.Position -= 1;
             exercise.Position += 1;
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
         }
     }
 
-    public int CreateExercise(string Title, int IdLecon)
+    public async Task<int> CreateExerciseAsync(string Title, int IdLecon)
     {
         var exercise = new Exercise
         {
             Titre = Title,
-            Position = GetNextPosition(IdLecon),
+            Position = await GetNextPositionAsync(IdLecon),
             IDLecon = IdLecon,
             IDDifficulte = 1,
             IDStatut = 1,
         };
         _context.Exercises.Add(exercise);
-        _context.SaveChanges();
+        await _context.SaveChangesAsync();
 
         return exercise.IDExercice;
     }
 
-    private int GetNextPosition(int IdLecon)
+    private async Task<int> GetNextPositionAsync(int IdLecon)
     {
         var exercises = _context.Exercises.Where(e => e.IDLecon == IdLecon);
-        var position = exercises.Any() ? exercises.Max(e => e.Position) : 0;
+        var position = await exercises.AnyAsync() ? await exercises.MaxAsync(e => e.Position) : 0;
         return position + 1;
     }
 
-    public void HideExercise(int exerciseId)
+    public async Task HideExerciseAsync(int exerciseId)
     {
-        var exercise = _context.Exercises.Find(exerciseId);
+        var exercise = await _context.Exercises.FindAsync(exerciseId);
         exercise.IDStatut = 1;
-        _context.SaveChanges();
+        await _context.SaveChangesAsync();
     }
 
-    public void UnHideExercise(int exerciseId)
+    public async Task UnHideExerciseAsync(int exerciseId)
     {
-        var exercise = _context.Exercises.Find(exerciseId);
+        var exercise = await _context.Exercises.FindAsync(exerciseId);
         exercise.IDStatut = 2;
-        _context.SaveChanges();
+        await _context.SaveChangesAsync();
     }
 
-    public void DeleteExercise(int exerciseId)
+    public async Task DeleteExerciseAsync(int exerciseId)
     {
-        var exercise = _context.Exercises.Find(exerciseId);
-        var followingExercises = _context.Exercises.Where(e => e.Position > exercise.Position && e.IDLecon == exercise.IDLecon);
+        var exercise = await _context.Exercises.FindAsync(exerciseId);
+        var followingExercises = await _context.Exercises.Where(e => e.Position > exercise.Position && e.IDLecon == exercise.IDLecon).ToListAsync();
         foreach (var followingExercise in followingExercises)
         {
             followingExercise.Position -= 1;
         }
 
         _context.Exercises.Remove(exercise);
-        _context.SaveChanges();
+        await _context.SaveChangesAsync();
     }
 
-    public void UpdateExerciseDetails(int exerciseId, string titre, string enonce, int iDDifficulte, string modele, string solution)
+    public async Task UpdateExerciseDetailsAsync(int exerciseId, string titre, string enonce, int iDDifficulte, string modele, string solution)
     {
-        var exercise = _context.Exercises.Find(exerciseId);
+        var exercise = await _context.Exercises.FindAsync(exerciseId);
 
         if (exercise != null)
         {
@@ -98,7 +99,7 @@ public class UpdateExerciseRepository : IUpdateExerciseRepository
             exercise.IDDifficulte = iDDifficulte;
             exercise.Modele = modele;
             exercise.Solution = solution;
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
         }
     }
 }

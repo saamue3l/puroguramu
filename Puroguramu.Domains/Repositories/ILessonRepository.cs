@@ -4,22 +4,22 @@ namespace Puroguramu.Domains.Repositories;
 
 public interface ILessonRepository
 {
-    public Lesson GetLesson(int lessonId);
+    public Task<Lesson> GetLessonAsync(int lessonId);
 
-    public IEnumerable<Exercise> GetExercisesForLesson(int lessonId);
-    public IEnumerable<Exercise> GetExercisesForLessonStudent(int lessonId);
+    public Task<IEnumerable<Exercise>> GetExercisesForLessonAsync(int lessonId);
+    public Task<IEnumerable<Exercise>> GetExercisesForLessonStudentAsync(int lessonId);
 
-    public List<Lesson> GetAllLessons();
+    public Task<List<Lesson>> GetAllLessonsAsync();
 
-    public (int TotalExercises, int CompletedExercises) GetLessonProgress(int lessonId, string userId);
+    public Task<(int TotalExercises, int CompletedExercises)> GetLessonProgressAsync(int lessonId, string userId);
 
-    public Exercise GetNextExercise(int currentLessonId, int currentExerciseId);
+    public Task<Exercise> GetNextExerciseAsync(int currentLessonId, int currentExerciseId);
 
-    public Exercise GetNextUncompletedExercise(string userId);
+    public Task<Exercise> GetNextUncompletedExerciseAsync(string userId);
 
-    public Exercise GetLastAttemptedExercise(string userId);
+    public Task<Exercise> GetLastAttemptedExerciseAsync(string userId);
 
-    public int GetNbStudentHasCompletedLesson(int lessonId);
+    public Task<int> GetNbStudentHasCompletedLessonAsync(int lessonId);
 
-    public int GetTotalStudents();
+    public Task<int> GetTotalStudentsAsync();
 }

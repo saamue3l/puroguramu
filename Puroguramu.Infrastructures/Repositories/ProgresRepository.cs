@@ -15,11 +15,11 @@ public class ProgresRepository : IProgresRepository
         _database = database;
     }
 
-    public Progress GetProgres(int exerciceId, string userId)
+    public async Task<Progress> GetProgresAsync(int exerciceId, string userId)
     {
-        var dbProgres = _database.Progress
+        var dbProgres = await _database.Progress
             .Include(p => p.ProgressStatus)
-            .FirstOrDefault(p => p.IDExercice == exerciceId && p.IDUtilisateur == userId);
+            .FirstOrDefaultAsync(p => p.IDExercice == exerciceId && p.IDUtilisateur == userId);
         if (dbProgres == null)
         {
             return null;
@@ -37,7 +37,7 @@ public class ProgresRepository : IProgresRepository
         };
     }
 
-    public Progress CreateProgres(Progress newProgress)
+    public async Task<Progress> CreateProgresAsync(Progress newProgress)
     {
         var dbProgres = new DbContexts.Progress()
         {
@@ -51,7 +51,7 @@ public class ProgresRepository : IProgresRepository
         };
 
         _database.Progress.Add(dbProgres);
-        _database.SaveChanges();
+        await _database.SaveChangesAsync();
 
         return new Progress
         {
@@ -65,10 +65,10 @@ public class ProgresRepository : IProgresRepository
         };
     }
 
-    public Progress UpdateProgresStatus(int exerciceId, string userId, int newStatus)
+    public async Task<Progress> UpdateProgresStatusAsync(int exerciceId, string userId, int newStatus)
     {
-        var dbProgres = _database.Progress
-            .FirstOrDefault(p => p.IDExercice == exerciceId && p.IDUtilisateur == userId);
+        var dbProgres = await _database.Progress
+            .FirstOrDefaultAsync(p => p.IDExercice == exerciceId && p.IDUtilisateur == userId);
         if (dbProgres == null)
         {
             return null;
@@ -76,7 +76,7 @@ public class ProgresRepository : IProgresRepository
 
         dbProgres.IDStatut = newStatus;
         dbProgres.DateDerniereTentative = DateTime.Now.ToString();
-        _database.SaveChanges();
+        await _database.SaveChangesAsync();
 
         return new Progress
         {
@@ -90,17 +90,17 @@ public class ProgresRepository : IProgresRepository
         };
     }
 
-    public Progress UpdateProgresAttempt(int exerciceId, string userId, string attempt)
+    public async Task<Progress> UpdateProgresAttemptAsync(int exerciceId, string userId, string attempt)
     {
-        var dbProgres = _database.Progress
-            .FirstOrDefault(p => p.IDExercice == exerciceId && p.IDUtilisateur == userId);
+        var dbProgres = await _database.Progress
+            .FirstOrDefaultAsync(p => p.IDExercice == exerciceId && p.IDUtilisateur == userId);
         if (dbProgres == null)
         {
             return null;
         }
 
         dbProgres.CodeDerniereTentative = attempt;
-        _database.SaveChanges();
+        await _database.SaveChangesAsync();
 
         return new Progress
         {
@@ -114,16 +114,17 @@ public class ProgresRepository : IProgresRepository
         };
     }
 
-    public void ResetProgressForAllUsers(int exerciceId)
+    public async Task ResetProgressForAllUsersAsync(int exerciceId)
     {
-        var dbProgres = _database.Progress
-            .Where(p => p.IDExercice == exerciceId && p.IDStatut == 3);
+        var dbProgres = await _database.Progress
+            .Where(p => p.IDExercice == exerciceId && p.IDStatut == 3)
+            .ToListAsync();
         foreach (var progres in dbProgres)
         {
             progres.IDStatut = 1;
             progres.CodeDerniereTentative = "";
         }
 
-        _database.SaveChanges();
+        await _database.SaveChangesAsync();
     }
 }

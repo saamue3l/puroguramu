@@ -28,11 +28,11 @@ namespace Puroguramu.App.Pages.Teachers
             _updateLessonRepository = updateLessonRepository;
         }
 
-        public IActionResult OnGet(string sortOrder)
+        public async Task<IActionResult> OnGetAsync(string sortOrder)
         {
-            var lessons = _repository.GetAllLessons();
+            var lessons = await _repository.GetAllLessonsAsync();
             var studentsCompletedLesson = new Dictionary<int, int>();
-            var totalStudents = _repository.GetTotalStudents();
+            var totalStudents = await _repository.GetTotalStudentsAsync();
             switch (sortOrder)
             {
                 case "title":
@@ -51,7 +51,7 @@ namespace Puroguramu.App.Pages.Teachers
 
             foreach (var lesson in lessons)
             {
-                studentsCompletedLesson[lesson.IDLecon] = _repository.GetNbStudentHasCompletedLesson(lesson.IDLecon);
+                studentsCompletedLesson[lesson.IDLecon] = await _repository.GetNbStudentHasCompletedLessonAsync(lesson.IDLecon);
             }
 
             LessonCardViewModels = lessons.Select(lesson => new LessonCardViewModel
@@ -62,38 +62,38 @@ namespace Puroguramu.App.Pages.Teachers
             return Page();
         }
 
-        public IActionResult OnPostMoveLessonUp(int lessonId)
+        public async Task<IActionResult> OnPostMoveLessonUpAsync(int lessonId)
         {
-            _updateLessonRepository.MoveLessonUp(lessonId);
+            await _updateLessonRepository.MoveLessonUpAsync(lessonId);
             return RedirectToPage();
         }
 
-        public IActionResult OnPostMoveLessonDown(int lessonId)
+        public async Task<IActionResult> OnPostMoveLessonDownAsync(int lessonId)
         {
-            _updateLessonRepository.MoveLessonDown(lessonId);
+            await _updateLessonRepository.MoveLessonDownAsync(lessonId);
             return RedirectToPage();
         }
 
-        public IActionResult OnPostHideLesson(int lessonId)
+        public async Task<IActionResult> OnPostHideLessonAsync(int lessonId)
         {
-            _updateLessonRepository.HideLesson(lessonId);
+            await _updateLessonRepository.HideLessonAsync(lessonId);
             return RedirectToPage();
         }
 
-        public IActionResult OnPostUnhideLesson(int lessonId)
+        public async Task<IActionResult> OnPostUnhideLessonAsync(int lessonId)
         {
-            _updateLessonRepository.UnHideLesson(lessonId);
+            await _updateLessonRepository.UnHideLessonAsync(lessonId);
             return RedirectToPage();
         }
 
-        public IActionResult OnPostDeleteLesson(int lessonId)
+        public async Task<IActionResult> OnPostDeleteLessonAsync(int lessonId)
         {
-            _updateLessonRepository.DeleteLesson(lessonId);
+            await _updateLessonRepository.DeleteLessonAsync(lessonId);
             return RedirectToPage();
         }
 
         [ValidateAntiForgeryToken]
-        public IActionResult OnPostCreateLesson(int lessonId)
+        public async Task<IActionResult> OnPostCreateLessonAsync(int lessonId)
         {
             if (!ModelState.IsValid)//if the model (CreateLessonInputModel) is not valid, return to the page
             {
@@ -101,7 +101,7 @@ namespace Puroguramu.App.Pages.Teachers
                 return RedirectToPage();
             }
 
-            var lessons = _repository.GetAllLessons().ToList();
+            var lessons = (await _repository.GetAllLessonsAsync()).ToList();
 
             if (lessons.Any(l => l.Intitule.ToLower() == CreateLessonInputModel.NewLessonName.ToLower()))
             {
@@ -109,14 +109,14 @@ namespace Puroguramu.App.Pages.Teachers
                 return RedirectToPage();
             }
 
-            var newLessonId = _updateLessonRepository.CreateLesson(CreateLessonInputModel.NewLessonName);
+            var newLessonId = await _updateLessonRepository.CreateLessonAsync(CreateLessonInputModel.NewLessonName);
             return RedirectToPage("EditLesson", new { lessonId = newLessonId });
         }
 
 
-        public int GetStudentHasCompletedLesson(int lessonId)
+        public async Task<int> GetStudentHasCompletedLessonAsync(int lessonId)
         {
-            return _repository.GetNbStudentHasCompletedLesson(lessonId);
+            return await _repository.GetNbStudentHasCompletedLessonAsync(lessonId);
         }
     }
 

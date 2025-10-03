@@ -19,10 +19,10 @@ namespace Puroguramu.App.Pages
             _repository = repository;
         }
 
-        public IActionResult OnGet(int lessonId)
+        public async Task<IActionResult> OnGetAsync(int lessonId)
         {
-            Lesson = _repository.GetLesson(lessonId);
-            Exercises = _repository.GetExercisesForLesson(lessonId);
+            Lesson = await _repository.GetLessonAsync(lessonId);
+            Exercises = await _repository.GetExercisesForLessonAsync(lessonId);
             return Page();
         }
     }

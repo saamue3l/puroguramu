@@ -45,8 +45,8 @@ public class EditExercise : PageModel
 
     public async Task OnGetAsync(int lessonId, int exerciseId)
     {
-        Lesson = _lessonRepository.GetLesson(lessonId);
-        ExerciseObject = _exerciseRepository.GetExercise(exerciseId);
+        Lesson = await _lessonRepository.GetLessonAsync(lessonId);
+        ExerciseObject = await _exerciseRepository.GetExerciseAsync(exerciseId);
         Modele = ExerciseObject.Modele;
         Solution = ExerciseObject.Solution;
     }
@@ -89,11 +89,11 @@ public class EditExercise : PageModel
                 return Unauthorized();
             }
 
-            _progressRepository.ResetProgressForAllUsers(inputModel.ExerciseId);
-            _updateExerciseRepository.UpdateExerciseDetails(inputModel.ExerciseId, inputModel.Titre, inputModel.Enonce, inputModel.IDDifficulte, inputModel.Modele, inputModel.Solution);
+            await _progressRepository.ResetProgressForAllUsersAsync(inputModel.ExerciseId);
+            await _updateExerciseRepository.UpdateExerciseDetailsAsync(inputModel.ExerciseId, inputModel.Titre, inputModel.Enonce, inputModel.IDDifficulte, inputModel.Modele, inputModel.Solution);
 
-            Lesson = _lessonRepository.GetLesson(inputModel.LessonId);
-            ExerciseObject = _exerciseRepository.GetExercise(inputModel.ExerciseId);
+            Lesson = await _lessonRepository.GetLessonAsync(inputModel.LessonId);
+            ExerciseObject = await _exerciseRepository.GetExerciseAsync(inputModel.ExerciseId);
 
             return RedirectToPage("/Teachers/EditExercise", new { lessonId = Lesson.IDLecon, exerciseId = ExerciseObject.IDExercice });
         }

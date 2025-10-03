@@ -48,16 +48,16 @@ public class DoExercise : PageModel
         _assessor = assessor;
     }
 
-    public IActionResult OnGet(int lessonId, int exerciseId)
+    public async Task<IActionResult> OnGetAsync(int lessonId, int exerciseId)
     {
-        Lesson = _lessonRepository.GetLesson(lessonId);
+        Lesson = await _lessonRepository.GetLessonAsync(lessonId);
 
         if (Lesson.IDStatut == 1)
         {
             return RedirectToPage("/Students/Index");
         }
 
-        ExerciseObject = _exerciseRepository.GetExercise(exerciseId);
+        ExerciseObject = await _exerciseRepository.GetExerciseAsync(exerciseId);
 
         if (ExerciseObject.IDLecon != lessonId || ExerciseObject.IDStatut == 1)
         {
@@ -68,7 +68,7 @@ public class DoExercise : PageModel
         Solution = ExerciseObject.Solution;
 
         var userId = _userManager.GetUserId(User);
-        var progress = _progresRepository.GetProgres(exerciseId, userId);
+        var progress = await _progresRepository.GetProgresAsync(exerciseId, userId);
 
         if (progress == null)
         {
@@ -80,7 +80,7 @@ public class DoExercise : PageModel
                 CodeDerniereTentative = ExerciseObject.Stub,
                 DateDerniereTentative = DateTime.Now.ToString(CultureInfo.InvariantCulture),
             };
-            _progresRepository.CreateProgres(progress);
+            await _progresRepository.CreateProgresAsync(progress);
         }
 
         Progress = progress;
@@ -94,7 +94,7 @@ public class DoExercise : PageModel
             Stub = ExerciseObject.Stub;
         }
 
-        NextExercise = _lessonRepository.GetNextExercise(ExerciseObject.IDLecon, ExerciseObject.IDExercice);
+        NextExercise = await _lessonRepository.GetNextExerciseAsync(ExerciseObject.IDLecon, ExerciseObject.IDExercice);
 
         return Page();
     }
@@ -107,19 +107,19 @@ public class DoExercise : PageModel
         var exerciseResult = await _assessor.Assess(exerciseId, userCode);
         var testResults = exerciseResult.TestResults;
         var userId = _userManager.GetUserId(User);
-        var progress = _progresRepository.GetProgres(exerciseId, userId);
+        var progress = await _progresRepository.GetProgresAsync(exerciseId, userId);
         var status = string.Empty;
         if (progress.IDStatut == 1 || progress.IDStatut == 2)
         {
-            _progresRepository.UpdateProgresAttempt(exerciseId, userId, userCode);
+            await _progresRepository.UpdateProgresAttemptAsync(exerciseId, userId, userCode);
             if (exerciseResult.Status == ExerciseStatus.Passed)
             {
-                _progresRepository.UpdateProgresStatus(exerciseId, userId, 3);
+                await _progresRepository.UpdateProgresStatusAsync(exerciseId, userId, 3);
                 status = "Passed";
             }
             else
             {
-                _progresRepository.UpdateProgresStatus(exerciseId, userId, 2);
+                await _progresRepository.UpdateProgresStatusAsync(exerciseId, userId, 2);
                 status = "Failed";
             }
         }
@@ -130,28 +130,28 @@ public class DoExercise : PageModel
     }
 
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> OnPostReset(int lessonId, int exerciseId)
+    public async Task<IActionResult> OnPostResetAsync(int lessonId, int exerciseId)
     {
         var userId = _userManager.GetUserId(User);
-        var progress = _progresRepository.GetProgres(exerciseId, userId);
+        var progress = await _progresRepository.GetProgresAsync(exerciseId, userId);
         if (progress != null)
         {
-            var exercise = _exerciseRepository.GetExercise(exerciseId);
+            var exercise = await _exerciseRepository.GetExerciseAsync(exerciseId);
             var originalStub = exercise.Stub;
-            _progresRepository.UpdateProgresAttempt(exerciseId, userId, originalStub);
+            await _progresRepository.UpdateProgresAttemptAsync(exerciseId, userId, originalStub);
         }
 
         return RedirectToPage(new { lessonId, exerciseId });
     }
 
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> OnPostAbandon(int lessonId, int exerciseId)
+    public async Task<IActionResult> OnPostAbandonAsync(int lessonId, int exerciseId)
     {
         var userId = _userManager.GetUserId(User);
-        var progress = _progresRepository.GetProgres(exerciseId, userId);
+        var progress = await _progresRepository.GetProgresAsync(exerciseId, userId);
         if (progress != null)
         {
-            _progresRepository.UpdateProgresStatus(exerciseId, userId, 4);
+            await _progresRepository.UpdateProgresStatusAsync(exerciseId, userId, 4);
         }
 
         TempData["NotificationType"] = "error";

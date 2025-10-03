@@ -27,22 +27,22 @@ public class ConsultLesson : PageModel
         _userManager = userManager;
     }
 
-    public IActionResult OnGet(int lessonId)
+    public async Task<IActionResult> OnGetAsync(int lessonId)
     {
-        Lesson = _repository.GetLesson(lessonId);
+        Lesson = await _repository.GetLessonAsync(lessonId);
 
         if (Lesson.IDStatut == 1)
         {
             return RedirectToPage("/Students/Index");
         }
 
-        var exercises = _repository.GetExercisesForLessonStudent(lessonId);
+        var exercises = await _repository.GetExercisesForLessonStudentAsync(lessonId);
         var userId = _userManager.GetUserId(User);
         ExercisesWithProgress = new List<(Exercise, Progress)>();
 
         foreach (var exercise in exercises)
         {
-            var progress = _progresRepository.GetProgres(exercise.IDExercice, userId);
+            var progress = await _progresRepository.GetProgresAsync(exercise.IDExercice, userId);
             if (progress == null)
             {
                 progress = new Progress

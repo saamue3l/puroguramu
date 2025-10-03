@@ -4,18 +4,18 @@ namespace Puroguramu.Domains.Repositories;
 
 public interface IUpdateLessonRepository
 {
-    public void MoveLessonUp(int lessonId);
+    public Task MoveLessonUpAsync(int lessonId);
 
-    public void MoveLessonDown(int lessonId);
+    public Task MoveLessonDownAsync(int lessonId);
 
-    public void HideLesson(int lessonId);
+    public Task HideLessonAsync(int lessonId);
 
-    public void UnHideLesson(int lessonId);
+    public Task UnHideLessonAsync(int lessonId);
 
-    public void DeleteLesson(int lessonId);
+    public Task DeleteLessonAsync(int lessonId);
 
-    public void UpdateLesson(Lesson lesson);
+    public Task UpdateLessonAsync(Lesson lesson);
 
-    public int CreateLesson(string Title);
+    public Task<int> CreateLessonAsync(string Title);
 
 }

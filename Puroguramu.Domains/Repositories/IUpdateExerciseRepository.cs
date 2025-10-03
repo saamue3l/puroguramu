@@ -4,17 +4,17 @@ namespace Puroguramu.Domains.Repositories;
 
 public interface IUpdateExerciseRepository
 {
-        int CreateExercise(string Title, int IdLecon);
+        Task<int> CreateExerciseAsync(string Title, int IdLecon);
 
-        void MoveExerciseUp(int exerciseId);
+        Task MoveExerciseUpAsync(int exerciseId);
 
-        void MoveExerciseDown(int exerciseId);
+        Task MoveExerciseDownAsync(int exerciseId);
 
-        void UpdateExerciseDetails(int exerciseId, string titre, string enonce, int iDDifficulte, string modele, string solution);
+        Task UpdateExerciseDetailsAsync(int exerciseId, string titre, string enonce, int iDDifficulte, string modele, string solution);
 
-        void HideExercise(int exerciseId);
+        Task HideExerciseAsync(int exerciseId);
 
-        void UnHideExercise(int exerciseId);
+        Task UnHideExerciseAsync(int exerciseId);
 
-        void DeleteExercise(int exerciseId);
+        Task DeleteExerciseAsync(int exerciseId);
 }

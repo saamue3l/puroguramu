@@ -32,10 +32,10 @@ namespace Puroguramu.App.Pages.Teachers
             _updateExerciseRepository = updateExerciseRepository;
         }
 
-        public IActionResult OnGet(int lessonId, string sortOrder)
+        public async Task<IActionResult> OnGetAsync(int lessonId, string sortOrder)
         {
-            Lesson = _lessonRepository.GetLesson(lessonId);
-            Exercises = _lessonRepository.GetExercisesForLesson(lessonId).ToList();
+            Lesson = await _lessonRepository.GetLessonAsync(lessonId);
+            Exercises = (await _lessonRepository.GetExercisesForLessonAsync(lessonId)).ToList();
             switch (sortOrder)
             {
                 case "title":
@@ -48,7 +48,7 @@ namespace Puroguramu.App.Pages.Teachers
                     Exercises = Exercises.OrderBy(e => e.Position).ToList();
                     break;
                 default:
-                    Exercises = Exercises.OrderBy(e => e.Position).ToList(); // Default sort by ID
+                    Exercises = Exercises.OrderBy(e => e.Position).ToList();
                     break;
             }
 
@@ -61,9 +61,9 @@ namespace Puroguramu.App.Pages.Teachers
             return Page();
         }
 
-        public IActionResult OnPostUpdateTitle([FromBody] UpdateTitleInputModel inputModel)
+        public async Task<IActionResult> OnPostUpdateTitleAsync([FromBody] UpdateTitleInputModel inputModel)
         {
-            var lesson = _lessonRepository.GetLesson(inputModel.LessonId);
+            var lesson = await _lessonRepository.GetLessonAsync(inputModel.LessonId);
             if (lesson == null)
             {
                 return new JsonResult(new { success = false, message = "Leçon non trouvée" });
@@ -75,60 +75,60 @@ namespace Puroguramu.App.Pages.Teachers
             }
 
             lesson.Intitule = inputModel.Title;
-            _updateLessonRepository.UpdateLesson(lesson);
+            await _updateLessonRepository.UpdateLessonAsync(lesson);
 
             return new JsonResult(new { success = true });
         }
 
-        public IActionResult OnPostUpdateDescription([FromBody] UpdateDescriptionInputModel inputModel)
+        public async Task<IActionResult> OnPostUpdateDescriptionAsync([FromBody] UpdateDescriptionInputModel inputModel)
         {
-            var lesson = _lessonRepository.GetLesson(inputModel.LessonId);
+            var lesson = await _lessonRepository.GetLessonAsync(inputModel.LessonId);
             if (lesson == null)
             {
                 return new JsonResult(new { success = false, message = "Leçon non trouvée" });
             }
 
             lesson.Description = inputModel.NewDescription;
-            _updateLessonRepository.UpdateLesson(lesson);
+            await _updateLessonRepository.UpdateLessonAsync(lesson);
 
             return new JsonResult(new { success = true });
         }
 
-        public IActionResult OnPostMoveExerciseDown(int exerciseId)
+        public async Task<IActionResult> OnPostMoveExerciseDownAsync(int exerciseId)
         {
-            _updateExerciseRepository.MoveExerciseDown(exerciseId);
+            await _updateExerciseRepository.MoveExerciseDownAsync(exerciseId);
             return RedirectToPage();
         }
 
-        public IActionResult OnPostMoveExerciseUp(int exerciseId)
+        public async Task<IActionResult> OnPostMoveExerciseUpAsync(int exerciseId)
         {
-            _updateExerciseRepository.MoveExerciseUp(exerciseId);
+            await _updateExerciseRepository.MoveExerciseUpAsync(exerciseId);
             return RedirectToPage();
         }
 
-        public IActionResult OnPostHideExercise(int exerciseId)
+        public async Task<IActionResult> OnPostHideExerciseAsync(int exerciseId)
         {
-            _updateExerciseRepository.HideExercise(exerciseId);
+            await _updateExerciseRepository.HideExerciseAsync(exerciseId);
             return RedirectToPage();
         }
 
-        public IActionResult OnPostUnHideExercise(int exerciseId)
+        public async Task<IActionResult> OnPostUnHideExerciseAsync(int exerciseId)
         {
-            _updateExerciseRepository.UnHideExercise(exerciseId);
+            await _updateExerciseRepository.UnHideExerciseAsync(exerciseId);
             return RedirectToPage();
         }
 
-        public IActionResult OnPostDeleteExercise(int exerciseId)
+        public async Task<IActionResult> OnPostDeleteExerciseAsync(int exerciseId)
         {
-            _updateExerciseRepository.DeleteExercise(exerciseId);
+            await _updateExerciseRepository.DeleteExerciseAsync(exerciseId);
             return RedirectToPage();
         }
 
         [ValidateAntiForgeryToken]
-        public IActionResult OnPostCreateExercise(int lessonId)
+        public async Task<IActionResult> OnPostCreateExerciseAsync(int lessonId)
         {
             Console.WriteLine(CreateExerciseInputModel.NewExerciseName);
-            var exercises = _lessonRepository.GetExercisesForLesson(lessonId).ToList();
+            var exercises = (await _lessonRepository.GetExercisesForLessonAsync(lessonId)).ToList();
 
             if (string.IsNullOrWhiteSpace(CreateExerciseInputModel.NewExerciseName) || !ModelState.IsValid)
             {
@@ -142,7 +142,7 @@ namespace Puroguramu.App.Pages.Teachers
                 return RedirectToPage();
             }
 
-            var newExerciseId = _updateExerciseRepository.CreateExercise(CreateExerciseInputModel.NewExerciseName, lessonId);
+            var newExerciseId = await _updateExerciseRepository.CreateExerciseAsync(CreateExerciseInputModel.NewExerciseName, lessonId);
             return RedirectToPage("EditExercise", new { lessonId = lessonId, exerciseId = newExerciseId });
         }
     }

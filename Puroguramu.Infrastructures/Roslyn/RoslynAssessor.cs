@@ -66,7 +66,7 @@ public class RoslynAssessor : IAssessExercise
     {
         _logger.LogDebug("Assessing exercise {ExerciseId}", exerciseId);
 
-        var exercise = _exerciseRepository.GetExercise(exerciseId);
+        var exercise = await _exerciseRepository.GetExerciseAsync(exerciseId);
         if (exercise == null)
         {
             _logger.LogWarning("Exercise {ExerciseId} not found", exerciseId);
@@ -222,7 +222,7 @@ public class RoslynAssessor : IAssessExercise
 
     public async Task<ExerciseResult> StubForExercise(int exerciseId)
     {
-        var exercise = _exerciseRepository.GetExercise(exerciseId);
+        var exercise = await _exerciseRepository.GetExerciseAsync(exerciseId);
         if (exercise == null)
         {
             _logger.LogWarning("Exercise {ExerciseId} not found for stub", exerciseId);
