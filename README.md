@@ -40,23 +40,12 @@ Plateforme d'apprentissage C# développée en binôme en 2024 dans le cadre d'un
 - [.NET 6.0 SDK](https://dotnet.microsoft.com/download/dotnet/6.0)
 - IDE compatible (Visual Studio 2022, JetBrains Rider, VS Code)
 
-## Installation
-
-### 1. Cloner le repository
-git clone https://github.com/saamue31/puroguramu.git
-
+## Lancer l'application
+```bash
+git clone https://github.com/saamue3l/puroguramu.git
 cd puroguramu/Puroguramu.App
-
-### 2. Installer l'outil EF Core
-dotnet tool install --global dotnet-ef --version 6.0.36
-
-### 3. Créer la base de données
-mkdir Data
-
-dotnet ef database update --context PuroguramuDbContext
-
-### 4. Lancer l'application
 dotnet run
+```
 
 L'application sera accessible sur le port affiché dans le terminal.
 
