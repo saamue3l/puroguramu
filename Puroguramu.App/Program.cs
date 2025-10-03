@@ -101,6 +101,9 @@ app.MapRazorPages();
 
 using (var scope = app.Services.CreateScope())
 {
+    var context = scope.ServiceProvider.GetRequiredService<PuroguramuDbContext>();
+    context.Database.Migrate();
+
     var userManager = scope.ServiceProvider.GetRequiredService<UserManager<PuroUser>>();
     var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
     await IdentityDataInitializer.SeedData(userManager, roleManager);
