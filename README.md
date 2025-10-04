@@ -31,7 +31,7 @@ Plateforme d'apprentissage C# développée en binôme en 2024 dans le cadre d'un
 - **.NET 6.0** - Framework principal
 - **ASP.NET Core Razor Pages** - Interface web
 - **Entity Framework Core** - ORM avec migrations
-- **SQLite** (développement) / **SQL Server** (production)
+- **SQLite** - Base de données
 - **ASP.NET Identity** - Authentification et autorisation
 - **Roslyn** - Compilation et évaluation dynamique de code C#
 
