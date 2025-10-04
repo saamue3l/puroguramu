@@ -24,16 +24,8 @@ builder.Services.AddScoped<IProgresRepository, ProgresRepository>();
 builder.Services.AddScoped<IExerciseRepository, ExerciseRepository>();
 builder.Services.AddScoped<IUpdateExerciseRepository, UpdateExerciseRepository>();
 
-if (builder.Environment.IsDevelopment())
-{
-    builder.Services.AddDbContext<PuroguramuDbContext>(
-        options => options.UseSqlite(builder.Configuration.GetConnectionString("PuroguramuDbContext")));
-}
-else
-{
-    builder.Services.AddDbContext<PuroguramuDbContext, ProdPuroguramuDbContext>(
-        options => options.UseSqlServer(builder.Configuration.GetConnectionString("PuroguramuDbContext")));
-}
+builder.Services.AddDbContext<PuroguramuDbContext>(
+    options => options.UseSqlite(builder.Configuration.GetConnectionString("PuroguramuDbContext")));
 
 builder.Services.Configure<RouteOptions>(options =>
 {
