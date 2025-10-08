@@ -15,7 +15,11 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddRazorPages();
 builder.Services.AddScoped<ReverseProxyLinksMiddleware>();
+
 builder.Services.AddScoped<IAssessExercise, RoslynAssessor>();
+
+builder.Services.AddScoped<Puroguramu.App.Services.IProgressService, Puroguramu.App.Services.ProgressService>();
+
 builder.Services.AddScoped<IStatsIndexRepository, StatsIndexRepository>();
 builder.Services.AddScoped<IGroupeRepository, GroupeRepository>();
 builder.Services.AddScoped<ILessonRepository, LessonRepository>();

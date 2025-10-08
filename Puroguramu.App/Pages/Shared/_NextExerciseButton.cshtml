@@ -1,0 +1,17 @@
+@model Puroguramu.Domains.Models.Exercise?
+
+@if (Model != null)
+{
+    <a asp-page="/Students/DoExercise" asp-route-lessonId="@Model.IDLecon" asp-route-exerciseId="@Model.IDExercice" class="ml-2 flex justify-center px-4 py-2 bg-dark-blue border border-white border-opacity-50 text-white rounded-lg hover:opacity-50">
+        <p class="pr-2">Prochain exercice</p>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6">
+            <path fill-rule="evenodd" d="M12.97 3.97a.75.75 0 0 1 1.06 0l7.5 7.5a.75.75 0 0 1 0 1.06l-7.5 7.5a.75.75 0 1 1-1.06-1.06l6.22-6.22H3a.75.75 0 0 1 0-1.5h16.19l-6.22-6.22a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd"/>
+        </svg>
+    </a>
+}
+else
+{
+    <div class="ml-2 flex justify-center px-4 py-2 bg-dark-blue border border-white border-opacity-50 text-white rounded-lg opacity-50">
+        <p class="pr-2">Pas d'exercice suivant</p>
+    </div>
+}

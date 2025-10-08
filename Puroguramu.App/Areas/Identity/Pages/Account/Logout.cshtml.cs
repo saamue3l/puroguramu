@@ -1,5 +1,3 @@
-// Licensed to the .NET Foundation under one or more agreements.
-// The .NET Foundation licenses this file to you under the MIT license.
 #nullable disable
 
 using System;
@@ -38,29 +36,5 @@ namespace Puroguramu.App.Areas.Identity.Pages.Account
                 return RedirectToPage("/Index");
             }
         }
-
-        /*public async Task<IActionResult> OnPostAsync(string returnUrl = null)
-        {
-            _logger.LogInformation("Logout");
-            returnUrl ??= Url.Content("~/");
-            _logger.LogInformation("Logout apres URL");
-
-            TempData["NotificationType"] = "success";
-            TempData["NotificationMessage"] = "Déconnexion confirmée!";
-
-            await _signInManager.SignOutAsync();
-            _logger.LogInformation("Logout apres signout");
-
-            if (returnUrl != null)
-            {
-                _logger.LogInformation("Redirect local");
-                return LocalRedirect(returnUrl);
-            }
-            else
-            {
-                _logger.LogInformation("Rediract Page");
-                return RedirectToPage("/accueil");
-            }
-        }*/
     }
 }

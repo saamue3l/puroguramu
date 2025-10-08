@@ -2,10 +2,11 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Puroguramu.App.Constants;
+using Puroguramu.App.ViewModels;
 using Puroguramu.Domains.Models;
 using Puroguramu.Domains.Repositories;
 using Puroguramu.Infrastructures.DbContexts;
-using Progress = Puroguramu.Domains.Models.Progress;
 
 namespace Puroguramu.App.Pages.Students;
 
@@ -16,9 +17,7 @@ public class ConsultLesson : PageModel
     private readonly IProgresRepository _progresRepository;
     private readonly UserManager<PuroUser> _userManager;
 
-    public Lesson Lesson { get; set; } = null!;
-
-    public List<(Exercise Exercise, Progress Progress)> ExercisesWithProgress { get; set; } = null!;
+    public ConsultLessonViewModel ViewModel { get; set; } = null!;
 
     public ConsultLesson(ILessonRepository repository, IProgresRepository progresRepository, UserManager<PuroUser> userManager)
     {
@@ -29,38 +28,41 @@ public class ConsultLesson : PageModel
 
     public async Task<IActionResult> OnGetAsync(int lessonId)
     {
-        Lesson = await _repository.GetLessonAsync(lessonId);
+        var lesson = await _repository.GetLessonAsync(lessonId);
 
-        if (Lesson.IDStatut == 1)
+        if (lesson.IDStatut == (int)EntityStatusEnum.Draft)
         {
             return RedirectToPage("/Students/Index");
         }
 
         var exercises = await _repository.GetExercisesForLessonStudentAsync(lessonId);
         var userId = _userManager.GetUserId(User);
-        ExercisesWithProgress = new List<(Exercise, Progress)>();
+        var exerciseProgressItems = new List<ExerciseProgressItem>();
 
         foreach (var exercise in exercises)
         {
             var progress = await _progresRepository.GetProgresAsync(exercise.IDExercice, userId);
-            if (progress == null)
-            {
-                progress = new Progress
-                {
-                    IDStatut = 0,
-                    IDUtilisateur = userId,
-                    IDExercice = exercise.IDExercice,
-                    CodeDerniereTentative = string.Empty,
-                    DateDerniereTentative = string.Empty,
-                    ProgressStatus = new ProgressStatus { IDStatut = 1, Nom = "À faire" },
-                };
-            }
 
-            if (progress.ProgressStatus.Nom != "Masqué")
+            var progressStatusName = progress?.ProgressStatus?.Nom ?? "À faire";
+
+            if (progressStatusName != "Masqué")
             {
-                ExercisesWithProgress.Add((exercise, progress));
+                exerciseProgressItems.Add(new ExerciseProgressItem
+                {
+                    LessonId = lessonId,
+                    Exercise = exercise,
+                    ProgressStatusName = progressStatusName
+                });
             }
         }
+
+        ViewModel = new ConsultLessonViewModel
+        {
+            LessonId = lesson.IDLecon,
+            LessonTitle = lesson.Intitule,
+            LessonDescription = lesson.Description,
+            Exercises = exerciseProgressItems
+        };
 
         return Page();
     }

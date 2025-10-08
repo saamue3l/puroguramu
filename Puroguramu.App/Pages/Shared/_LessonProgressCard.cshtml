@@ -1,0 +1,21 @@
+@model Puroguramu.App.ViewModels.LessonProgressItem
+
+<a asp-page="/Students/ConsultLesson" asp-route-lessonId="@Model.Lesson.IDLecon">
+    <div class="bg-gray-900 py-2 rounded-lg mb-2 relative hover:opacity-50 cursor-pointer">
+        <div class="flex items-start w-full">
+            <div class="w-10 flex justify-center text-gray-500 text-xl font-light">@Model.Lesson.Position</div>
+            <div class="w-full">
+                <div class="flex justify-between items-center text-white text-xl font-light">
+                    <p>@Model.Lesson.Intitule</p>
+                    <p class="italic"><span class="text-primary">@Model.ProgressText</span></p>
+                </div>
+                <div class="flex text-primary pt-3 pb-2 items-center w-full">
+                    <div class="w-full bg-white h-2 rounded-full">
+                        <div class="bg-primary h-2 rounded-full" style="width: @Model.ProgressPercentage%"></div>
+                    </div>
+                </div>
+            </div>
+            <span class="w-10"></span>
+        </div>
+    </div>
+</a>

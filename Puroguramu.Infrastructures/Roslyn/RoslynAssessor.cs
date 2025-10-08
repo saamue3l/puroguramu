@@ -218,7 +218,7 @@ public class RoslynAssessor : IAssessExercise
     }
 
     public string InjectIntoTemplateForTest(Exercise exercise, string solution)
-        => exercise.Modele.Replace("// code-insertion-point", solution);
+        => exercise.Modele.Replace("", solution);
 
     public async Task<ExerciseResult> StubForExercise(int exerciseId)
     {

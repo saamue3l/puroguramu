@@ -45,7 +45,7 @@ namespace Puroguramu.App.Pages.Teachers
                     lessons = lessons.OrderBy(l => l.Position).ToList();
                     break;
                 default:
-                    lessons = lessons.OrderBy(l => l.Position).ToList(); // Default sort by ID
+                    lessons = lessons.OrderBy(l => l.Position).ToList();
                     break;
             }
 
@@ -95,7 +95,7 @@ namespace Puroguramu.App.Pages.Teachers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> OnPostCreateLessonAsync(int lessonId)
         {
-            if (!ModelState.IsValid)//if the model (CreateLessonInputModel) is not valid, return to the page
+            if (!ModelState.IsValid)
             {
                 TempData["ErrorMessage"] = "Veuillez fournir un nom de leçon valide.";
                 return RedirectToPage();

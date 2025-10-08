@@ -1,0 +1,14 @@
+@model (string Text, string Handler, bool IsEnabled)
+
+@if (Model.IsEnabled)
+{
+    <a class="text-white text-xs font-bold bg-primary rounded-lg px-3 py-2 hover:opacity-50 inline-block mr-4" asp-page-handler="@Model.Handler">
+        @Model.Text
+    </a>
+}
+else
+{
+    <span class="text-white text-xs font-bold bg-primary rounded-lg px-3 py-2 opacity-50 inline-block mr-4">
+        @Model.Text
+    </span>
+}

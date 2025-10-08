@@ -25,10 +25,9 @@ public class Exercise
 
     public string Stub => @"public class Exercice
 {
-  // Tapez votre code ici
 }
 ";
 
     public string InjectIntoTemplate(string code)
-        => Modele.Replace("// code-insertion-point", code);
+        => Modele.Replace("", code);
 }

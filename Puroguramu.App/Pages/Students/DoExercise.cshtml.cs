@@ -1,9 +1,11 @@
-﻿using System.Globalization;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Puroguramu.App.Constants;
 using Puroguramu.App.Pages.Students.EntryModels;
+using Puroguramu.App.Services;
+using Puroguramu.App.ViewModels;
 using Puroguramu.Domains;
 using Puroguramu.Domains.Models;
 using Puroguramu.Domains.Repositories;
@@ -16,85 +18,65 @@ public class DoExercise : PageModel
 {
     private readonly ILessonRepository _lessonRepository;
     private readonly IExerciseRepository _exerciseRepository;
-    private readonly IProgresRepository _progresRepository;
+    private readonly IProgressService _progressService;
     private readonly UserManager<PuroUser> _userManager;
     private readonly IAssessExercise _assessor;
 
-    [BindProperty]
-    public Lesson Lesson { get; set; } = null!;
+    public DoExerciseViewModel ViewModel { get; set; } = null!;
 
-    [BindProperty]
-    public Exercise ExerciseObject { get; set; } = null!;
-
-    public Domains.Models.Progress Progress { get; set; } = null!;
-
-    public string OriginalStub { get; set; } = null!;
-
-    public string Stub { get; set; } = null!;
-
-    public string Solution { get; set; } = null!;
-
-    [BindProperty]
-    public string UserCode { get; set; } = null!;
-
-    public Exercise NextExercise { get; set; } = null!;
-
-    public DoExercise(ILessonRepository lessonRepository, IExerciseRepository exerciseRepository, IProgresRepository progresRepository, UserManager<PuroUser> userManager, IAssessExercise assessor)
+    public DoExercise(
+        ILessonRepository lessonRepository,
+        IExerciseRepository exerciseRepository,
+        IProgressService progressService,
+        UserManager<PuroUser> userManager,
+        IAssessExercise assessor)
     {
         _lessonRepository = lessonRepository;
         _exerciseRepository = exerciseRepository;
-        _progresRepository = progresRepository;
+        _progressService = progressService;
         _userManager = userManager;
         _assessor = assessor;
     }
 
     public async Task<IActionResult> OnGetAsync(int lessonId, int exerciseId)
     {
-        Lesson = await _lessonRepository.GetLessonAsync(lessonId);
+        var lesson = await _lessonRepository.GetLessonAsync(lessonId);
 
-        if (Lesson.IDStatut == 1)
+        if (lesson.IDStatut == (int)EntityStatusEnum.Draft)
         {
             return RedirectToPage("/Students/Index");
         }
 
-        ExerciseObject = await _exerciseRepository.GetExerciseAsync(exerciseId);
+        var exercise = await _exerciseRepository.GetExerciseAsync(exerciseId);
 
-        if (ExerciseObject.IDLecon != lessonId || ExerciseObject.IDStatut == 1)
+        if (exercise.IDLecon != lessonId || exercise.IDStatut == (int)EntityStatusEnum.Draft)
         {
             return RedirectToPage("/Students/Index");
         }
-
-        OriginalStub = ExerciseObject.Stub;
-        Solution = ExerciseObject.Solution;
 
         var userId = _userManager.GetUserId(User);
-        var progress = await _progresRepository.GetProgresAsync(exerciseId, userId);
+        var progress = await _progressService.GetOrCreateProgressAsync(exerciseId, userId, exercise.Stub);
 
-        if (progress == null)
+        var currentStub = !string.IsNullOrEmpty(progress.CodeDerniereTentative)
+            ? progress.CodeDerniereTentative
+            : exercise.Stub;
+
+        var nextExercise = await _lessonRepository.GetNextExerciseAsync(exercise.IDLecon, exercise.IDExercice);
+
+        ViewModel = new DoExerciseViewModel
         {
-            progress = new Domains.Models.Progress()
-            {
-                IDExercice = exerciseId,
-                IDUtilisateur = userId,
-                IDStatut = 1,
-                CodeDerniereTentative = ExerciseObject.Stub,
-                DateDerniereTentative = DateTime.Now.ToString(CultureInfo.InvariantCulture),
-            };
-            await _progresRepository.CreateProgresAsync(progress);
-        }
-
-        Progress = progress;
-
-        if (!string.IsNullOrEmpty(progress.CodeDerniereTentative))
-        {
-            Stub = progress.CodeDerniereTentative;
-        }
-        else
-        {
-            Stub = ExerciseObject.Stub;
-        }
-
-        NextExercise = await _lessonRepository.GetNextExerciseAsync(ExerciseObject.IDLecon, ExerciseObject.IDExercice);
+            LessonId = lesson.IDLecon,
+            LessonTitle = lesson.Intitule,
+            ExerciseId = exercise.IDExercice,
+            ExerciseTitle = exercise.Titre,
+            ExerciseStatement = exercise.Enonce,
+            DifficultyLevel = exercise.IDDifficulte,
+            OriginalStub = exercise.Stub,
+            CurrentStub = currentStub,
+            Solution = exercise.Solution,
+            ProgressStatus = (ProgressStatusEnum)progress.IDStatut,
+            NextExercise = nextExercise
+        };
 
         return Page();
     }
@@ -103,28 +85,32 @@ public class DoExercise : PageModel
     {
         var exerciseId = inputModel.ExerciseId;
         var userCode = inputModel.UserCode;
-
-        var exerciseResult = await _assessor.Assess(exerciseId, userCode);
-        var testResults = exerciseResult.TestResults;
         var userId = _userManager.GetUserId(User);
-        var progress = await _progresRepository.GetProgresAsync(exerciseId, userId);
-        var status = string.Empty;
-        if (progress.IDStatut == 1 || progress.IDStatut == 2)
+
+        if (!await _progressService.CanUpdateProgressAsync(exerciseId, userId))
         {
-            await _progresRepository.UpdateProgresAttemptAsync(exerciseId, userId, userCode);
-            if (exerciseResult.Status == ExerciseStatus.Passed)
-            {
-                await _progresRepository.UpdateProgresStatusAsync(exerciseId, userId, 3);
-                status = "Passed";
-            }
-            else
-            {
-                await _progresRepository.UpdateProgresStatusAsync(exerciseId, userId, 2);
-                status = "Failed";
-            }
+            return new JsonResult(new { Status = "Error", Results = Array.Empty<object>() });
         }
 
-        var results = testResults.Select(tr => new { tr.Label, Status = tr.Status.ToString(), Error = tr.ErrorMessage }).ToList();
+        var exerciseResult = await _assessor.Assess(exerciseId, userCode);
+
+        await _progressService.UpdateProgressAttemptAsync(exerciseId, userId, userCode);
+
+        var status = string.Empty;
+        if (exerciseResult.Status == ExerciseStatus.Passed)
+        {
+            await _progressService.UpdateProgressStatusAsync(exerciseId, userId, ProgressStatusEnum.Completed);
+            status = "Passed";
+        }
+        else
+        {
+            await _progressService.UpdateProgressStatusAsync(exerciseId, userId, ProgressStatusEnum.InProgress);
+            status = "Failed";
+        }
+
+        var results = exerciseResult.TestResults
+            .Select(tr => new { tr.Label, Status = tr.Status.ToString(), Error = tr.ErrorMessage })
+            .ToList();
 
         return new JsonResult(new { Status = status, Results = results });
     }
@@ -133,13 +119,8 @@ public class DoExercise : PageModel
     public async Task<IActionResult> OnPostResetAsync(int lessonId, int exerciseId)
     {
         var userId = _userManager.GetUserId(User);
-        var progress = await _progresRepository.GetProgresAsync(exerciseId, userId);
-        if (progress != null)
-        {
-            var exercise = await _exerciseRepository.GetExerciseAsync(exerciseId);
-            var originalStub = exercise.Stub;
-            await _progresRepository.UpdateProgresAttemptAsync(exerciseId, userId, originalStub);
-        }
+        var exercise = await _exerciseRepository.GetExerciseAsync(exerciseId);
+        await _progressService.UpdateProgressAttemptAsync(exerciseId, userId, exercise.Stub);
 
         return RedirectToPage(new { lessonId, exerciseId });
     }
@@ -148,11 +129,7 @@ public class DoExercise : PageModel
     public async Task<IActionResult> OnPostAbandonAsync(int lessonId, int exerciseId)
     {
         var userId = _userManager.GetUserId(User);
-        var progress = await _progresRepository.GetProgresAsync(exerciseId, userId);
-        if (progress != null)
-        {
-            await _progresRepository.UpdateProgresStatusAsync(exerciseId, userId, 4);
-        }
+        await _progressService.UpdateProgressStatusAsync(exerciseId, userId, ProgressStatusEnum.Abandoned);
 
         TempData["NotificationType"] = "error";
         TempData["NotificationMessage"] = "Exercice abandonné.";

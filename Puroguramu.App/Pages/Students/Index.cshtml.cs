@@ -2,7 +2,8 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Puroguramu.Domains.Models;
+using Puroguramu.App.Constants;
+using Puroguramu.App.ViewModels;
 using Puroguramu.Domains.Repositories;
 using Puroguramu.Infrastructures.DbContexts;
 
@@ -14,11 +15,7 @@ public class Index : PageModel
     private readonly ILessonRepository _repository;
     private readonly UserManager<PuroUser> _userManager;
 
-    public List<(Lesson Lesson, int TotalExercises, int CompletedExercises)> Lessons { get; set; }
-
-    public Exercise NextExercise { get; set; }
-
-    public Exercise LastAttemptedExercise { get; set; }
+    public StudentsIndexViewModel ViewModel { get; set; } = null!;
 
     public Index(ILessonRepository repository, UserManager<PuroUser> userManager)
     {
@@ -29,18 +26,28 @@ public class Index : PageModel
     public async Task<IActionResult> OnGetAsync()
     {
         var userId = _userManager.GetUserId(User);
-        var lessons = (await _repository.GetAllLessonsAsync()).Where(lesson => lesson.IDStatut == 2);
-        Lessons = new List<(Lesson, int, int)>();
+        var publishedLessons = (await _repository.GetAllLessonsAsync())
+            .Where(lesson => lesson.IDStatut == (int)EntityStatusEnum.Published);
 
-        foreach (var lesson in lessons)
+        var lessonProgressItems = new List<LessonProgressItem>();
+
+        foreach (var lesson in publishedLessons)
         {
             var (totalExercises, completedExercises) = await _repository.GetLessonProgressAsync(lesson.IDLecon, userId);
-            Lessons.Add((lesson, totalExercises, completedExercises));
+            lessonProgressItems.Add(new LessonProgressItem
+            {
+                Lesson = lesson,
+                TotalExercises = totalExercises,
+                CompletedExercises = completedExercises
+            });
         }
 
-        NextExercise = await _repository.GetNextUncompletedExerciseAsync(userId);
-
-        LastAttemptedExercise = await _repository.GetLastAttemptedExerciseAsync(userId);
+        ViewModel = new StudentsIndexViewModel
+        {
+            Lessons = lessonProgressItems,
+            NextExercise = await _repository.GetNextUncompletedExerciseAsync(userId),
+            LastAttemptedExercise = await _repository.GetLastAttemptedExerciseAsync(userId)
+        };
 
         return Page();
     }
